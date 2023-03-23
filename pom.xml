@@ -5,7 +5,7 @@
 
 	<groupId>cool.cena</groupId>
 	<artifactId>gpt-spring-boot-starter</artifactId>
-	<version>0.0.6-SNAPSHOT</version>
+	<version>0.0.7-DEV</version>
 	<name>BootGPT</name>
 	<description>A SpringBoot starter for quick access to GPT chat completion。</description>
 

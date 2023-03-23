@@ -1,9 +1,12 @@
 package cool.cena.bootgpt.pojo.chat;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ResponseBodyChoice {
     
     private int index;
     private Message message;
+    @JsonProperty("finish_reason")
     private String finishReason;
     
     public int getIndex() {

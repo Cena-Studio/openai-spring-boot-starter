@@ -15,8 +15,11 @@ public class BootGptAutoConfigurationProperties {
     @DecimalMin("0")
     @DecimalMax("2")
     private double temperature = 1;
-
     private double nucleus = 1;
+
+    private int single = 500;
+    private int context = 500;
+    private int completion = 500;
 
     public String getKey() {
         return key;

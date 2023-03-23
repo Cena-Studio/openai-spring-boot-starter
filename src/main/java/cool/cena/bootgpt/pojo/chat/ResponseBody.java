@@ -3,7 +3,9 @@ package cool.cena.bootgpt.pojo.chat;
 import java.util.List;
 
 public class ResponseBody {
-    private String id, object, model;
+
+    private int status;
+    private String id, object, model, errMessage;
     private Long created;
     private List<ResponseBodyChoice> choices;
     private ResponseBodyUsage usage;
@@ -57,7 +59,28 @@ public class ResponseBody {
         this.choices = choices;
     }
 
+    public String getErrMessage() {
+        return errMessage;
+    }
+
+    public void setErrMessage(String errMessage) {
+        this.errMessage = errMessage;
+    }
+
+    public boolean isNormal() {
+        return status == 200;
+    }
+
+    public int getStatus(){
+        return this.status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public Message getResponseMessage(){
         return this.choices.get(0).getMessage();
     }
+
 }
