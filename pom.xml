@@ -3,11 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>cool.cena</groupId>
-	<artifactId>gpt-spring-boot-starter</artifactId>
+	<groupId>cool.cena.openai</groupId>
+	<artifactId>openai-spring-boot-starter</artifactId>
 	<version>0.0.7-DEV</version>
 	<name>BootGPT</name>
-	<description>A SpringBoot starter for quick access to GPT chat completion。</description>
+	<description>A SpringBoot starter for quick access to OpenAI's API。</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
