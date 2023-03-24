@@ -29,7 +29,7 @@ public class OpenAiSource {
         this.openAiChatCompletionApiAccessor = new OpenAiApiAccessor(httpHeaders);
     }
 
-    public OpenAiChatCompletionContext newContext(){
+    public OpenAiChatCompletionContext createChatCompletionContext(){
         return new OpenAiChatCompletionContext(this.openAiChatCompletionApiAccessor);
     }
 }

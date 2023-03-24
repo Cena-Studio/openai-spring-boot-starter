@@ -10,7 +10,7 @@ import cool.cena.openai.chatcompletion.pojo.chat.OpenAiChatCompletionResponse;
 
 public class OpenAiChatCompletionContext {
 
-    private OpenAiApiAccessor bootGptApiAccessor;
+    private OpenAiApiAccessor opanAiApiAccessor;
 
     private int contextVersion;
 
@@ -20,8 +20,8 @@ public class OpenAiChatCompletionContext {
     private List<Segment> segments;
     private int segmentSize, cumulativeToken, maxPromptToken, maxCompletionToken;
 
-    public OpenAiChatCompletionContext(OpenAiApiAccessor bootGptApiAccessor) {
-        this.bootGptApiAccessor = bootGptApiAccessor;
+    public OpenAiChatCompletionContext(OpenAiApiAccessor opanAiApiAccessor) {
+        this.opanAiApiAccessor = opanAiApiAccessor;
 
         this.contextVersion = 0;
 
@@ -69,29 +69,29 @@ public class OpenAiChatCompletionContext {
     public OpenAiChatCompletionResponse createChatCompletion(){
         int requestContextVersion = ++this.contextVersion;
 
-        OpenAiChatCompletionResponse bootGptResponse = this.bootGptApiAccessor.sendRequest(this.contextMessages);
+        OpenAiChatCompletionResponse opanAiChatCompletionResponse = this.opanAiApiAccessor.sendRequest(this.contextMessages);
 
-        // the following lines execute after the response from bootGptApiAccessor received
+        // the following lines execute after the response from opanAiApiAccessor received
         // current context is the latest context
         if(requestContextVersion == this.contextVersion){
             
-            int responseBodyStatus = bootGptResponse.getStatus();
-            bootGptResponse.setStatus(responseBodyStatus);
+            int responseBodyStatus = opanAiChatCompletionResponse.getStatus();
+            opanAiChatCompletionResponse.setStatus(responseBodyStatus);
 
             // normal response
             if (responseBodyStatus == 200) {
 
-                System.out.println("Request " + requestContextVersion + " success. Message: " + bootGptResponse.getObjectMessage().getContent());
+                System.out.println("Request " + requestContextVersion + " success. Message: " + opanAiChatCompletionResponse.getObjectMessage().getContent());
 
                 // token process
-                int responsePromptToken = bootGptResponse.getPromptToken();
+                int responsePromptToken = opanAiChatCompletionResponse.getPromptToken();
                 int segmentToken = responsePromptToken - this.cumulativeToken;
                 Segment promptSegment = new Segment(segmentSize, segmentToken);
                 segments.add(promptSegment);
 
                 System.out.println("ps added. size: " + segmentSize + " token: " + segmentToken);
         
-                int responseCompletionToken = bootGptResponse.getCompletionToken();
+                int responseCompletionToken = opanAiChatCompletionResponse.getCompletionToken();
                 Segment completionSegment = new Segment(1, responseCompletionToken);
                 segments.add(completionSegment);
     
@@ -99,7 +99,7 @@ public class OpenAiChatCompletionContext {
 
                 this.cumulativeToken = responsePromptToken + responseCompletionToken;
 
-                Message responseMessage = bootGptResponse.getObjectMessage();
+                Message responseMessage = opanAiChatCompletionResponse.getObjectMessage();
                 this.addMessage(responseMessage);
 
                 this.segmentSize = 0;
@@ -110,23 +110,23 @@ public class OpenAiChatCompletionContext {
                     this.reduceContext();
                 }
             
-                return bootGptResponse;
+                return opanAiChatCompletionResponse;
 
             }
 
             // request error
-            System.out.println("Request " + requestContextVersion + " error: " + bootGptResponse.getErrMessage());
+            System.out.println("Request " + requestContextVersion + " error: " + opanAiChatCompletionResponse.getErrMessage());
     
-            return bootGptResponse;
+            return opanAiChatCompletionResponse;
 
         }
 
         // context has been updated during the request
         System.out.println("Context outdated. Request " + requestContextVersion + " has been deprecated.");
-        bootGptResponse.setStatus(900);
-        bootGptResponse.setErrMessage("This request has been deprecated because it has been superseded by a new request.");
+        opanAiChatCompletionResponse.setStatus(900);
+        opanAiChatCompletionResponse.setErrMessage("This request has been deprecated because it has been superseded by a new request.");
 
-        return bootGptResponse;
+        return opanAiChatCompletionResponse;
         
     }
 
