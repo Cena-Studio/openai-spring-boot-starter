@@ -25,5 +25,13 @@ public class Message {
     public void setContent(String content) {
         this.content = content;
     }
+
+    public boolean hasSameRole(Message anotherMessage){
+        return this.role == anotherMessage.getRole();
+    }
+
+    public void merge(Message anotherMessage){
+        this.content += "\n" + anotherMessage.content;
+    }
     
 }

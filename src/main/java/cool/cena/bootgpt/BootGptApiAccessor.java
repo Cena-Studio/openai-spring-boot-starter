@@ -12,14 +12,13 @@ import org.springframework.web.client.RestTemplate;
 
 import cool.cena.bootgpt.pojo.chat.Message;
 import cool.cena.bootgpt.pojo.chat.RequestBody;
-import cool.cena.bootgpt.pojo.chat.ResponseBody;
+import cool.cena.bootgpt.pojo.chat.BootGptResponse;
 
 public class BootGptApiAccessor {
 
     private RestTemplate restTemplate;
     private String requestUrl;
     private HttpHeaders httpHeaders;
-    private double temperature, nucleus;
 
     public BootGptApiAccessor(HttpHeaders httpHeaders){
         this.restTemplate = new RestTemplate();
@@ -27,20 +26,20 @@ public class BootGptApiAccessor {
         this.httpHeaders = httpHeaders;
     }
     
-    public ResponseBody sendRequest(List<Message> contextMessages){
+    public BootGptResponse sendRequest(List<Message> contextMessages){
 
         RequestBody requestBody = new RequestBody(contextMessages);
         HttpEntity<RequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
         
         try{
 
-            ResponseBody responseBody = this.restTemplate.postForObject(requestUrl, requestEntity, ResponseBody.class);
+            BootGptResponse responseBody = this.restTemplate.postForObject(requestUrl, requestEntity, BootGptResponse.class);
             responseBody.setStatus(200);
             return responseBody;
         
         }catch(HttpClientErrorException e){
 
-            ResponseBody responseBody = new ResponseBody();
+            BootGptResponse responseBody = new BootGptResponse();
 
             HttpStatusCode httpStatusCode = e.getStatusCode();
 
@@ -68,8 +67,8 @@ public class BootGptApiAccessor {
 
         }catch(RestClientException e){
 
-            ResponseBody responseBody = new ResponseBody();
-            responseBody.setStatus(600);
+            BootGptResponse responseBody = new BootGptResponse();
+            responseBody.setStatus(999);
             responseBody.setErrMessage("[BootGPT Error Prompt] " + e.getMessage() + ".\n[BootGPT Error Prompt] BootGPT has not yet included possible causes for this exception.");
 
             e.printStackTrace();

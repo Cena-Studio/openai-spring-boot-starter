@@ -3,35 +3,44 @@ package cool.cena.bootgpt;
 import java.util.ArrayList;
 import java.util.List;
 
-import cool.cena.bootgpt.pojo.TokenSegment;
+import cool.cena.bootgpt.pojo.Segment;
+import cool.cena.bootgpt.pojo.chat.BootGptResponse;
 import cool.cena.bootgpt.pojo.chat.Message;
-import cool.cena.bootgpt.pojo.chat.ResponseBody;
 
 public class BootGptContext {
 
     private BootGptApiAccessor bootGptApiAccessor;
 
+    private int contextVersion;
+
     private List<Message> contextMessages;
-    private String lastResponseMessage;
+    private Message lastContextMessage;
     
-    private List<TokenSegment> tokenSegments;
-    private int currentSegementSize, cumulativeToken;
+    private List<Segment> segments;
+    private int segmentSize, cumulativeToken, maxPromptToken, maxCompletionToken;
 
     public BootGptContext(BootGptApiAccessor bootGptApiAccessor) {
         this.bootGptApiAccessor = bootGptApiAccessor;
 
+        this.contextVersion = 0;
+
         this.contextMessages = new ArrayList<>();
-        this.lastResponseMessage = "";
         
-        this.tokenSegments = new ArrayList<>();
-        this.currentSegementSize = 0;
+        this.segments = new ArrayList<>();
+        this.segmentSize = 0;
         this.cumulativeToken = 0;
+        this.maxPromptToken = 2048;
 
     }
 
-    private void addMessage(Message message){
-        this.contextMessages.add(message);
-        this.currentSegementSize += 1;
+    private void addMessage(Message newMessage){
+        if(this.lastContextMessage != null && this.lastContextMessage.hasSameRole(newMessage)){
+            this.lastContextMessage.merge(newMessage);
+        }else{
+            this.contextMessages.add(newMessage);
+            this.lastContextMessage = newMessage;
+            this.segmentSize++;
+        }
     }
 
     public BootGptContext addSystemMessage(String newMessageContent){
@@ -56,48 +65,82 @@ public class BootGptContext {
         return this.contextMessages;
     }
 
-    public String getLastResponseMessage(){
-        return this.lastResponseMessage;
-    }
+    public BootGptResponse sendMessage(){
+        int requestContextVersion = ++this.contextVersion;
 
-    public BootGptContext sendMessage(){
+        BootGptResponse bootGptResponse = this.bootGptApiAccessor.sendRequest(this.contextMessages);
 
-        ResponseBody responseBody = this.bootGptApiAccessor.sendRequest(this.contextMessages);
-
-        if (responseBody.isNormal()) {
-
-            Message responseMessage = responseBody.getResponseMessage();
-            this.addMessage(responseMessage);
-            this.lastResponseMessage = responseMessage.getContent();
-    
-            int responsePromptToken = responseBody.getUsage().getPromptTokens();
-            int currentSegmentToken = responsePromptToken - this.cumulativeToken;
-            TokenSegment promptTokenSegment = new TokenSegment(currentSegementSize, currentSegmentToken);
-            tokenSegments.add(promptTokenSegment);
-    
-            int responseCompletionToken = responseBody.getUsage().getCompletionTokens();
-            TokenSegment completionTokenSegment = new TokenSegment(1, responseCompletionToken);
-            tokenSegments.add(completionTokenSegment);
-    
-            this.currentSegementSize = 0;
-            this.cumulativeToken = responsePromptToken + responseCompletionToken;
+        // the following lines execute after the response from bootGptApiAccessor received
+        // current context is the latest context
+        if(requestContextVersion == this.contextVersion){
             
-        }else if(responseBody.getStatus() == 400){
+            int responseBodyStatus = bootGptResponse.getStatus();
+            bootGptResponse.setStatus(responseBodyStatus);
 
+            // normal response
+            if (responseBodyStatus == 200) {
+
+                System.out.println("Request " + requestContextVersion + " success. Message: " + bootGptResponse.getObjectMessage().getContent());
+
+                // token process
+                int responsePromptToken = bootGptResponse.getPromptToken();
+                int segmentToken = responsePromptToken - this.cumulativeToken;
+                Segment promptSegment = new Segment(segmentSize, segmentToken);
+                segments.add(promptSegment);
+
+                System.out.println("ps added. size: " + segmentSize + " token: " + segmentToken);
+        
+                int responseCompletionToken = bootGptResponse.getCompletionToken();
+                Segment completionSegment = new Segment(1, responseCompletionToken);
+                segments.add(completionSegment);
+    
+                System.out.println("cs added. size: " + 1 + " token: " + responseCompletionToken);
+
+                this.cumulativeToken = responsePromptToken + responseCompletionToken;
+
+                Message responseMessage = bootGptResponse.getObjectMessage();
+                this.addMessage(responseMessage);
+
+                this.segmentSize = 0;
+
+                System.out.println("cumulative token: " + this.cumulativeToken);
+
+                while(this.cumulativeToken > this.maxPromptToken){
+                    this.reduceContext();
+                }
             
+                return bootGptResponse;
 
-        }else{
+            }
 
-
+            // request error
+            System.out.println("Request " + requestContextVersion + " error: " + bootGptResponse.getErrMessage());
+    
+            return bootGptResponse;
 
         }
 
-        return this;
+        // context has been updated during the request
+        System.out.println("Context outdated. Request " + requestContextVersion + " has been deprecated.");
+        bootGptResponse.setStatus(900);
+        bootGptResponse.setErrMessage("This request has been deprecated because it has been superseded by a new request.");
+
+        return bootGptResponse;
+        
     }
 
-    public BootGptContext sendMessage(String newMessageContent){
-        this.addUserMessage(newMessageContent);
-        this.sendMessage();
-        return this;
+    public BootGptResponse sendMessage(String newMessageContent){
+        return this.addUserMessage(newMessageContent).sendMessage();
+    }
+
+    // token management
+    public void reduceContext(){
+        int segmentSize = this.segments.get(0).getSize();
+        int segmentToken = this.segments.get(0).getToken();
+        this.contextMessages.subList(0, segmentSize).clear();
+        this.segments.remove(0);
+        this.cumulativeToken -= segmentToken;
+
+        System.out.println("segment removed. current token: " + this.cumulativeToken);
     }
 }

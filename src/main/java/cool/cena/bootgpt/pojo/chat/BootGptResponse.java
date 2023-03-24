@@ -2,7 +2,7 @@ package cool.cena.bootgpt.pojo.chat;
 
 import java.util.List;
 
-public class ResponseBody {
+public class BootGptResponse {
 
     private int status;
     private String id, object, model, errMessage;
@@ -11,50 +11,27 @@ public class ResponseBody {
     private ResponseBodyUsage usage;
 
     // getters and setters
-    public String getId() {
-        return id;
-    }
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getObject() {
-        return object;
     }
 
     public void setObject(String object) {
         this.object = object;
     }
 
-    public String getModel() {
-        return model;
-    }
-
     public void setModel(String model) {
         this.model = model;
-    }
-
-    public Long getCreated() {
-        return created;
     }
 
     public void setCreated(Long created) {
         this.created = created;
     }
 
-    public ResponseBodyUsage getUsage() {
-        return usage;
-    }
-
     public void setUsage(ResponseBodyUsage usage) {
         this.usage = usage;
     }
-
-    public List<ResponseBodyChoice> getChoices() {
-        return choices;
-    }
-
+    
     public void setChoices(List<ResponseBodyChoice> choices) {
         this.choices = choices;
     }
@@ -67,10 +44,6 @@ public class ResponseBody {
         this.errMessage = errMessage;
     }
 
-    public boolean isNormal() {
-        return status == 200;
-    }
-
     public int getStatus(){
         return this.status;
     }
@@ -79,8 +52,23 @@ public class ResponseBody {
         this.status = status;
     }
 
-    public Message getResponseMessage(){
+    public int getPromptToken(){
+        return this.usage.getPromptTokens();
+    }
+
+    public int getCompletionToken(){
+        return this.usage.getCompletionTokens();
+    }
+
+    public Message getObjectMessage(){
         return this.choices.get(0).getMessage();
+    }
+
+    public String getMessage(){
+        if (this.status == 200) {
+            return this.choices.get(0).getMessage().getContent();
+        }
+        return null;
     }
 
 }

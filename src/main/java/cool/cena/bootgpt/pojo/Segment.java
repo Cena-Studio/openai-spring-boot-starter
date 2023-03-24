@@ -1,10 +1,10 @@
 package cool.cena.bootgpt.pojo;
 
-public class TokenSegment {
+public class Segment {
 
     private int size, token;
     
-    public TokenSegment(int size, int token){
+    public Segment(int size, int token){
         this.size = size;
         this.token = token;
     }
