@@ -10,30 +10,28 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import cool.cena.openai.chatcompletion.pojo.chat.Message;
 import cool.cena.openai.chatcompletion.pojo.chat.OpenAiChatCompletionResponse;
-import cool.cena.openai.chatcompletion.pojo.chat.RequestBody;
+import cool.cena.openai.chatcompletion.pojo.chat.OpenAiChatCompletionRequestBody;
 
 public class OpenAiApiAccessor {
 
+    private final String CHAT_COMPLETION_URL = "https://api.openai.com/v1/chat/completions";
+
     private RestTemplate restTemplate;
-    private String requestUrl;
     private HttpHeaders httpHeaders;
 
     public OpenAiApiAccessor(HttpHeaders httpHeaders){
         this.restTemplate = new RestTemplate();
-        this.requestUrl = "https://api.openai.com/v1/chat/completions";
         this.httpHeaders = httpHeaders;
     }
     
-    public OpenAiChatCompletionResponse sendRequest(List<Message> contextMessages){
+    public OpenAiChatCompletionResponse sendChatCompletionRequest(OpenAiChatCompletionRequestBody requestBody){
 
-        RequestBody requestBody = new RequestBody(contextMessages);
-        HttpEntity<RequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+        HttpEntity<OpenAiChatCompletionRequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
         
         try{
 
-            OpenAiChatCompletionResponse responseBody = this.restTemplate.postForObject(requestUrl, requestEntity, OpenAiChatCompletionResponse.class);
+            OpenAiChatCompletionResponse responseBody = this.restTemplate.postForObject(this.CHAT_COMPLETION_URL, requestEntity, OpenAiChatCompletionResponse.class);
             responseBody.setStatus(200);
             return responseBody;
         

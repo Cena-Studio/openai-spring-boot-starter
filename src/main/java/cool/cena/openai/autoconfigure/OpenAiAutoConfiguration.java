@@ -7,26 +7,32 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import cool.cena.openai.OpenAiSource;
+import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
 
 @Configuration
 @EnableConfigurationProperties(OpenAiProperties.class)
 public class OpenAiAutoConfiguration {
     
     @Autowired
-    OpenAiProperties bootGptAutoConfigurationProperties;
+    OpenAiProperties properties;
 
     @Bean
     @ConditionalOnProperty(prefix="openai", name = "organization", havingValue = "ConditionalOnMissingProperty", matchIfMissing = true)
-    public OpenAiSource configureBootGptApiAccessor(){
-        String httpHeaderAuthorization = "Bearer " + bootGptAutoConfigurationProperties.getKey();
+    public OpenAiSource configureOpenAiApiAccessor(){
+        String httpHeaderAuthorization = "Bearer " + properties.getKey();
         return new OpenAiSource(httpHeaderAuthorization);
     }
 
     @Bean
     @ConditionalOnProperty(prefix="openai", name = "organization")
-    public OpenAiSource configureBootGptApiAccessorWithOrganization(){
-        String httpHeaderAuthorization = "Bearer " + bootGptAutoConfigurationProperties.getKey();
-        String httpHeaderOpenAiOrganization = bootGptAutoConfigurationProperties.getOrganization();
+    public OpenAiSource configureOpenAiApiAccessorWithOrganization(){
+        String httpHeaderAuthorization = "Bearer " + properties.getKey();
+        String httpHeaderOpenAiOrganization = properties.getOrganization();
         return new OpenAiSource(httpHeaderAuthorization, httpHeaderOpenAiOrganization);
+    }
+
+    @Bean
+    public OpenAiChatCompletionProperties toChatCompletionProperties(){
+        return properties.getChatCompletion();
     }
 }

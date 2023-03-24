@@ -1,13 +1,18 @@
 package cool.cena.openai;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
 import cool.cena.openai.chatcompletion.OpenAiChatCompletionContext;
+import cool.cena.openai.chatcompletion.pojo.chat.OpenAiChatCompletionRequestBody;
 
 public class OpenAiSource {
 
     private OpenAiApiAccessor openAiChatCompletionApiAccessor;
+    @Autowired
+    private OpenAiChatCompletionProperties chatCompletionProperties;
 
     public OpenAiSource(String httpHeaderAuthorization){
 
@@ -30,6 +35,7 @@ public class OpenAiSource {
     }
 
     public OpenAiChatCompletionContext createChatCompletionContext(){
-        return new OpenAiChatCompletionContext(this.openAiChatCompletionApiAccessor);
+        OpenAiChatCompletionRequestBody chatCompletionRequestBody = new OpenAiChatCompletionRequestBody(chatCompletionProperties);
+        return new OpenAiChatCompletionContext(this.openAiChatCompletionApiAccessor, chatCompletionRequestBody);
     }
 }
