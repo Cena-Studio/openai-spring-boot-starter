@@ -5,7 +5,7 @@ This project is an **unofficial** Spring Boot starter for quick access to Open A
 This project is currently established on Spring Boot 3.0.4. Broader version support will be provided based on feedback and demands from the community in the future. In the meantime, please make sure that your Spring Boot project version is compatible with this starter.
 
 ## 2 Development Roadmap
-- Chat Completion <span style="color: #7B4B41">current stage</span>
+- Chat Completion ```diff - current stage```
 - Completion
 - Image Completion
 - HTTP Connection Configuration
