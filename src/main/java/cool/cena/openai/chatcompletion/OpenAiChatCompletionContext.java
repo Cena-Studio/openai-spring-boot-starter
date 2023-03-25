@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cool.cena.openai.OpenAiApiAccessor;
-import cool.cena.openai.chatcompletion.pojo.Segment;
-import cool.cena.openai.chatcompletion.pojo.chat.Message;
-import cool.cena.openai.chatcompletion.pojo.chat.OpenAiChatCompletionRequestBody;
-import cool.cena.openai.chatcompletion.pojo.chat.OpenAiChatCompletionResponse;
+import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionMessage;
+import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionRequestBody;
+import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionResponse;
 
 public class OpenAiChatCompletionContext {
 
@@ -16,8 +15,8 @@ public class OpenAiChatCompletionContext {
 
     private int contextVersion;
 
-    private List<Message> contextMessages;
-    private Message lastContextMessage;
+    private List<OpenAiChatCompletionMessage> contextMessages;
+    private OpenAiChatCompletionMessage lastContextMessage;
     
     private List<Segment> segments;
     private int segmentSize, cumulativeToken, maxPromptToken;
@@ -37,7 +36,7 @@ public class OpenAiChatCompletionContext {
 
     }
 
-    private void addMessage(Message newMessage){
+    private void addMessage(OpenAiChatCompletionMessage newMessage){
         if(this.lastContextMessage != null && this.lastContextMessage.hasSameRole(newMessage)){
             this.lastContextMessage.merge(newMessage);
         }else{
@@ -48,24 +47,24 @@ public class OpenAiChatCompletionContext {
     }
 
     public OpenAiChatCompletionContext addSystemMessage(String newMessageContent){
-        Message newMessage = new Message("system", newMessageContent);
+        OpenAiChatCompletionMessage newMessage = new OpenAiChatCompletionMessage("system", newMessageContent);
         this.addMessage(newMessage);
         return this;
     }
 
     public OpenAiChatCompletionContext addUserMessage(String newMessageContent){
-        Message newMessage = new Message("user", newMessageContent);
+        OpenAiChatCompletionMessage newMessage = new OpenAiChatCompletionMessage("user", newMessageContent);
         this.addMessage(newMessage);
         return this;
     }
 
     public OpenAiChatCompletionContext addAssistantMessage(String newMessageContent){
-        Message newMessage = new Message("assistant", newMessageContent);
+        OpenAiChatCompletionMessage newMessage = new OpenAiChatCompletionMessage("assistant", newMessageContent);
         this.addMessage(newMessage);
         return this;
     }
 
-    public List<Message> getContextMessages(){
+    public List<OpenAiChatCompletionMessage> getContextMessages(){
         return this.contextMessages;
     }
 
@@ -73,6 +72,7 @@ public class OpenAiChatCompletionContext {
         int requestContextVersion = ++this.contextVersion;
 
         requestBody.setMessages(this.contextMessages);
+        System.out.println(requestBody.getMessages().toString());
         OpenAiChatCompletionResponse response = this.apiAccessor.sendChatCompletionRequest(requestBody);
 
         // the following lines execute after the response from opanAiApiAccessor received
@@ -103,7 +103,7 @@ public class OpenAiChatCompletionContext {
 
                 this.cumulativeToken = responsePromptToken + responseCompletionToken;
 
-                Message responseMessage = response.getObjectMessage();
+                OpenAiChatCompletionMessage responseMessage = response.getObjectMessage();
                 this.addMessage(responseMessage);
 
                 this.segmentSize = 0;
@@ -147,5 +147,32 @@ public class OpenAiChatCompletionContext {
         this.cumulativeToken -= segmentToken;
 
         System.out.println("segment removed. current token: " + this.cumulativeToken);
+    }
+
+    public static class Segment {
+
+        private int size, token;
+        
+        public Segment(int size, int token){
+            this.size = size;
+            this.token = token;
+        }
+    
+        public int getSize() {
+            return size;
+        }
+    
+        public void setSize(int size) {
+            this.size = size;
+        }
+    
+        public int getToken() {
+            return token;
+        }
+    
+        public void setToken(int token) {
+            this.token = token;
+        }
+        
     }
 }

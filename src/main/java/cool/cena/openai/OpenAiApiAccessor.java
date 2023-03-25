@@ -1,7 +1,5 @@
 package cool.cena.openai;
 
-import java.util.List;
-
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,8 +8,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import cool.cena.openai.chatcompletion.pojo.chat.OpenAiChatCompletionResponse;
-import cool.cena.openai.chatcompletion.pojo.chat.OpenAiChatCompletionRequestBody;
+import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionRequestBody;
+import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionResponse;
 
 public class OpenAiApiAccessor {
 

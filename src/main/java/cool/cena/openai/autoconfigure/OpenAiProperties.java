@@ -7,13 +7,14 @@ import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
-/* @Configuration */
+@Configuration
 @ConfigurationProperties(prefix="openai")
 public class OpenAiProperties {
 
     private String key, organization;
-    private OpenAiChatCompletionProperties chatCompletion;
+    private OpenAiChatCompletionProperties chatCompletion = new OpenAiChatCompletionProperties();
 
     public String getKey() {
         return key;
@@ -34,12 +35,10 @@ public class OpenAiProperties {
     public OpenAiChatCompletionProperties getChatCompletion() {
         return chatCompletion;
     }
-
+    
     public void setChatCompletion(OpenAiChatCompletionProperties chatCompletion) {
         this.chatCompletion = chatCompletion;
     }
-    
-    
 
     public static class OpenAiChatCompletionProperties{
 
@@ -47,23 +46,23 @@ public class OpenAiProperties {
         
         @DecimalMin("0")
         @DecimalMax("2")
-        private double temperature;
-        private double topP;
+        private Double temperature;
+        private Double topP;
     
-        private double n;
+        private Double n;
         private boolean stream;
 
         private List<String> stop;
 
-        private int maxPromptToken = 3000;
-        private int maxCompletionToken;
+        private Integer maxPromptToken = 3000;
+        private Integer maxCompletionToken;
 
         @DecimalMin("-2.0")
         @DecimalMax("2.0")
-        private double presencePenalty;
+        private Double presencePenalty;
         @DecimalMin("-2.0")
         @DecimalMax("2.0")
-        private double frequencyPenalty;
+        private Double frequencyPenalty;
 
         private Map<String, Integer> logitBias;
         private String user;
@@ -74,22 +73,22 @@ public class OpenAiProperties {
         public void setModel(String model) {
             this.model = model;
         }
-        public double getTemperature() {
+        public Double getTemperature() {
             return temperature;
         }
-        public void setTemperature(double temperature) {
+        public void setTemperature(Double temperature) {
             this.temperature = temperature;
         }
-        public double getTopP() {
+        public Double getTopP() {
             return topP;
         }
-        public void setTopP(double topP) {
+        public void setTopP(Double topP) {
             this.topP = topP;
         }
-        public double getN() {
+        public Double getN() {
             return n;
         }
-        public void setN(double n) {
+        public void setN(Double n) {
             this.n = n;
         }
         public boolean isStream() {
@@ -104,28 +103,28 @@ public class OpenAiProperties {
         public void setStop(List<String> stop) {
             this.stop = stop;
         }
-        public int getMaxPromptToken() {
+        public Integer getMaxPromptToken() {
             return maxPromptToken;
         }
-        public void setMaxPromptToken(int maxPromptToken) {
+        public void setMaxPromptToken(Integer maxPromptToken) {
             this.maxPromptToken = maxPromptToken;
         }
-        public int getMaxCompletionToken() {
+        public Integer getMaxCompletionToken() {
             return maxCompletionToken;
         }
-        public void setMaxCompletionToken(int maxCompletionToken) {
+        public void setMaxCompletionToken(Integer maxCompletionToken) {
             this.maxCompletionToken = maxCompletionToken;
         }
-        public double getPresencePenalty() {
+        public Double getPresencePenalty() {
             return presencePenalty;
         }
-        public void setPresencePenalty(double presencePenalty) {
+        public void setPresencePenalty(Double presencePenalty) {
             this.presencePenalty = presencePenalty;
         }
-        public double getFrequencyPenalty() {
+        public Double getFrequencyPenalty() {
             return frequencyPenalty;
         }
-        public void setFrequencyPenalty(double frequencyPenalty) {
+        public void setFrequencyPenalty(Double frequencyPenalty) {
             this.frequencyPenalty = frequencyPenalty;
         }
         public Map<String, Integer> getLogitBias() {

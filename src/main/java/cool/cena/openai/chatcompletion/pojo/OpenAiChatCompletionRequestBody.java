@@ -1,4 +1,4 @@
-package cool.cena.openai.chatcompletion.pojo.chat;
+package cool.cena.openai.chatcompletion.pojo;
 
 import java.util.List;
 
@@ -10,12 +10,12 @@ import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionPrope
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OpenAiChatCompletionRequestBody {
     private String model, user;
-    private double temperature;
+    private Double temperature;
     @JsonProperty("top_p")
-    private double topP;
+    private Double topP;
     @JsonProperty("max_tokens")
-    private int maxCompletionToken;
-    private List<Message> messages;
+    private Integer maxCompletionToken;
+    private List<OpenAiChatCompletionMessage> messages;
 
     public OpenAiChatCompletionRequestBody(OpenAiChatCompletionProperties chatCompletionProperties) {
         this.model = chatCompletionProperties.getModel();
@@ -41,38 +41,36 @@ public class OpenAiChatCompletionRequestBody {
         this.user = user;
     }
 
-    public double getTemperature() {
+    public Double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(double temperature) {
+    public void setTemperature(Double temperature) {
         this.temperature = temperature;
     }
 
-    public double getTopP() {
+    public Double getTopP() {
         return topP;
     }
 
-    public void setTopP(double topP) {
+    public void setTopP(Double topP) {
         this.topP = topP;
     }
 
-    public int getMaxCompletionToken() {
+    public Integer getMaxCompletionToken() {
         return maxCompletionToken;
     }
 
-    public void setMaxCompletionToken(int maxCompletionToken) {
+    public void setMaxCompletionToken(Integer maxCompletionToken) {
         this.maxCompletionToken = maxCompletionToken;
     }
 
-    public List<Message> getMessages() {
+    public List<OpenAiChatCompletionMessage> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<Message> messages) {
+    public void setMessages(List<OpenAiChatCompletionMessage> messages) {
         this.messages = messages;
     }
-
-    
     
 }

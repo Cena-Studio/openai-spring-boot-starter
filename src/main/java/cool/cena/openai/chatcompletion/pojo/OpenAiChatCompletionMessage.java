@@ -1,11 +1,11 @@
-package cool.cena.openai.chatcompletion.pojo.chat;
+package cool.cena.openai.chatcompletion.pojo;
 
-public class Message {
+public class OpenAiChatCompletionMessage {
     private String role, content;
 
-    public Message(){}
+    public OpenAiChatCompletionMessage(){}
 
-    public Message(String role, String content) {
+    public OpenAiChatCompletionMessage(String role, String content) {
         this.role = role;
         this.content = content;
     }
@@ -26,11 +26,11 @@ public class Message {
         this.content = content;
     }
 
-    public boolean hasSameRole(Message anotherMessage){
+    public boolean hasSameRole(OpenAiChatCompletionMessage anotherMessage){
         return this.role == anotherMessage.getRole();
     }
 
-    public void merge(Message anotherMessage){
+    public void merge(OpenAiChatCompletionMessage anotherMessage){
         this.content += "\n" + anotherMessage.content;
     }
     

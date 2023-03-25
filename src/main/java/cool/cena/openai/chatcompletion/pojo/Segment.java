@@ -1,6 +1,6 @@
 package cool.cena.openai.chatcompletion.pojo;
 
-public class Segment {
+public static class Segment {
 
     private int size, token;
     
@@ -24,7 +24,5 @@ public class Segment {
     public void setToken(int token) {
         this.token = token;
     }
-
-    
     
 }
