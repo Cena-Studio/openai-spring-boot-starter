@@ -1,16 +1,14 @@
 package cool.cena.openai;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
 import cool.cena.openai.chatcompletion.OpenAiChatCompletionContext;
-import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionRequestBody;
 
 public class OpenAiSource {
 
-    private OpenAiApiAccessor openAiChatCompletionApiAccessor;
+    private OpenAiApiAccessor chatCompletionApiAccessor;
 
     private OpenAiChatCompletionProperties chatCompletionProperties;
 
@@ -19,7 +17,7 @@ public class OpenAiSource {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("Authorization", httpHeaderAuthorization);
-        this.openAiChatCompletionApiAccessor = new OpenAiApiAccessor(httpHeaders);
+        this.chatCompletionApiAccessor = new OpenAiApiAccessor(httpHeaders);
 
         this.chatCompletionProperties = chatCompletionProperties;
 
@@ -34,11 +32,10 @@ public class OpenAiSource {
         httpHeaders.set("Authorization", httpHeaderAuthorization);
         httpHeaders.set("OpenAI-Organization", httpHeaderOpenAiOrganization);
         
-        this.openAiChatCompletionApiAccessor = new OpenAiApiAccessor(httpHeaders);
+        this.chatCompletionApiAccessor = new OpenAiApiAccessor(httpHeaders);
     }
 
     public OpenAiChatCompletionContext createChatCompletionContext(){
-        OpenAiChatCompletionRequestBody chatCompletionRequestBody = new OpenAiChatCompletionRequestBody(chatCompletionProperties);
-        return new OpenAiChatCompletionContext(this.openAiChatCompletionApiAccessor, chatCompletionRequestBody);
+        return new OpenAiChatCompletionContext(this.chatCompletionApiAccessor, chatCompletionProperties);
     }
 }

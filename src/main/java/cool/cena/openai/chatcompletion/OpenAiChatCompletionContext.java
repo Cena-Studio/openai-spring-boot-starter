@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cool.cena.openai.OpenAiApiAccessor;
+import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
 import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionMessage;
 import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionResponse;
@@ -21,9 +22,9 @@ public class OpenAiChatCompletionContext {
     private List<Segment> segments;
     private int segmentSize, cumulativeToken, maxPromptToken;
 
-    public OpenAiChatCompletionContext(OpenAiApiAccessor apiAccessor, OpenAiChatCompletionRequestBody requestBody) {
+    public OpenAiChatCompletionContext(OpenAiApiAccessor apiAccessor, OpenAiChatCompletionProperties openAiChatCompletionProperties) {
         this.apiAccessor = apiAccessor;
-        this.requestBody = requestBody;
+        this.requestBody = new OpenAiChatCompletionRequestBody(openAiChatCompletionProperties);
 
         this.contextVersion = 0;
 
@@ -32,7 +33,7 @@ public class OpenAiChatCompletionContext {
         this.segments = new ArrayList<>();
         this.segmentSize = 0;
         this.cumulativeToken = 0;
-        this.maxPromptToken = 2048;
+        this.maxPromptToken = openAiChatCompletionProperties.getMaxPromptToken();
 
     }
 
@@ -149,7 +150,7 @@ public class OpenAiChatCompletionContext {
         System.out.println("segment removed. current token: " + this.cumulativeToken);
     }
 
-    public static class Segment {
+    private static class Segment {
 
         private int size, token;
         
@@ -162,16 +163,8 @@ public class OpenAiChatCompletionContext {
             return size;
         }
     
-        public void setSize(int size) {
-            this.size = size;
-        }
-    
         public int getToken() {
             return token;
-        }
-    
-        public void setToken(int token) {
-            this.token = token;
         }
         
     }
