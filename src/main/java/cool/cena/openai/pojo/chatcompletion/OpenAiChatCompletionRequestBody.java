@@ -1,4 +1,4 @@
-package cool.cena.openai.chatcompletion.pojo;
+package cool.cena.openai.pojo.chatcompletion;
 
 import java.util.List;
 

@@ -1,13 +1,13 @@
-package cool.cena.openai.chatcompletion;
+package cool.cena.openai.context;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cool.cena.openai.OpenAiApiAccessor;
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
-import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionMessage;
-import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionRequestBody;
-import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionResponse;
+import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionMessage;
+import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
+import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponse;
 
 public class OpenAiChatCompletionContext {
 

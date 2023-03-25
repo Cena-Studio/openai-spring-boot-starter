@@ -6,10 +6,11 @@ This project is currently established on Spring Boot 3.0.4. Broader version supp
 
 ## 2 Development Roadmap
 - Chat Completion ```<- current stage```
-- Completion
-- Image Completion
+- Text Completion
+- Moderation
+- Image Generation
 - HTTP Connection Configuration
-- Other Completions
+- Other APIs
 
 # Quick Start
 ## 1 Basic Preparation

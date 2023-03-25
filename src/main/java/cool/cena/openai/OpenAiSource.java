@@ -4,7 +4,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
-import cool.cena.openai.chatcompletion.OpenAiChatCompletionContext;
+import cool.cena.openai.context.OpenAiChatCompletionContext;
 
 public class OpenAiSource {
 

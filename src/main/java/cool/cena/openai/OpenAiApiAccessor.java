@@ -8,8 +8,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionRequestBody;
-import cool.cena.openai.chatcompletion.pojo.OpenAiChatCompletionResponse;
+import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
+import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponse;
 
 public class OpenAiApiAccessor {
 
