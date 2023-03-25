@@ -34,7 +34,7 @@ openai:
 ```
 As you may have noticed from the above example, it is worth mentioning that the "key" is essential and the only required field (so that OpenAI can ~~charge you for~~ offer their services), which means the configuration of this starter could be extremely simple and fast. On the other hand, for advanced developers, this starter also provides more optional parameters based on the OpenAPI spec. Please refer to [the application.yml template](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/application.yml) for a complete configuration example.
 ### 1.3 Autowiring
-Use auto-wiring mechanism to load the OpenAISource bean in the classes where it is needed. The following is an example for a Service class:
+Use auto-wiring mechanism to load the OpenAISource bean in the classes wherever the request is needed. The following is an example for a service class:
 ```java
 import cool.cena.openai.OpenAiSource;
 

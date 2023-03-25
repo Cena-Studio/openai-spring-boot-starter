@@ -34,6 +34,7 @@ public class OpenAiChatCompletionContext {
         this.segmentSize = 0;
         this.cumulativeToken = 0;
         this.maxPromptToken = openAiChatCompletionProperties.getMaxPromptToken();
+        System.out.println(this.maxPromptToken);
 
     }
 
