@@ -1,5 +1,6 @@
 package cool.cena.openai.pojo.chatcompletion;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -15,7 +16,7 @@ public class OpenAiChatCompletionRequestBody {
     private Double topP;
     @JsonProperty("max_tokens")
     private Integer maxCompletionToken;
-    private List<OpenAiChatCompletionMessage> messages;
+    private List<ChatCompletionMessage> messages;
 
     public OpenAiChatCompletionRequestBody(OpenAiChatCompletionProperties chatCompletionProperties) {
         this.model = chatCompletionProperties.getModel();
@@ -23,6 +24,7 @@ public class OpenAiChatCompletionRequestBody {
         this.temperature = chatCompletionProperties.getTemperature();
         this.topP = chatCompletionProperties.getTopP();
         this.maxCompletionToken = chatCompletionProperties.getMaxCompletionToken();
+        this.messages = new ArrayList<>();
     }
 
     public String getModel() {
@@ -65,11 +67,11 @@ public class OpenAiChatCompletionRequestBody {
         this.maxCompletionToken = maxCompletionToken;
     }
 
-    public List<OpenAiChatCompletionMessage> getMessages() {
+    public List<ChatCompletionMessage> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<OpenAiChatCompletionMessage> messages) {
+    public void setMessages(List<ChatCompletionMessage> messages) {
         this.messages = messages;
     }
     

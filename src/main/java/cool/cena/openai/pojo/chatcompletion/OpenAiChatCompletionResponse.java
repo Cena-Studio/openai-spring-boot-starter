@@ -9,8 +9,8 @@ public class OpenAiChatCompletionResponse {
     private int status;
     private String id, object, model, errMessage;
     private Long created;
-    private List<ResponseBodyChoice> choices;
-    private ResponseBodyUsage usage;
+    private List<OpenAiChatCompletionResponseChoices> choices;
+    private OpenAiChatCompletionResponseUsage usage;
 
     // getters and setters
 
@@ -30,11 +30,11 @@ public class OpenAiChatCompletionResponse {
         this.created = created;
     }
 
-    public void setUsage(ResponseBodyUsage usage) {
+    public void setUsage(OpenAiChatCompletionResponseUsage usage) {
         this.usage = usage;
     }
     
-    public void setChoices(List<ResponseBodyChoice> choices) {
+    public void setChoices(List<OpenAiChatCompletionResponseChoices> choices) {
         this.choices = choices;
     }
 
@@ -62,21 +62,25 @@ public class OpenAiChatCompletionResponse {
         return this.usage.getCompletionTokens();
     }
 
-    public OpenAiChatCompletionMessage getObjectMessage(){
+    public ChatCompletionMessage getObjectMessage(){
         return this.choices.get(0).getMessage();
     }
 
     public String getMessage(){
+        return this.getMessage(0);
+    }
+
+    public String getMessage(int choice){
         if (this.status == 200) {
-            return this.choices.get(0).getMessage().getContent();
+            return this.choices.get(choice).getMessage().getContent();
         }
         return null;
     }
 
-    public static class ResponseBodyChoice {
+    public static class OpenAiChatCompletionResponseChoices {
     
         private int index;
-        private OpenAiChatCompletionMessage message;
+        private ChatCompletionMessage message;
         @JsonProperty("finish_reason")
         private String finishReason;
         
@@ -86,10 +90,10 @@ public class OpenAiChatCompletionResponse {
         public void setIndex(int index) {
             this.index = index;
         }
-        public OpenAiChatCompletionMessage getMessage() {
+        public ChatCompletionMessage getMessage() {
             return message;
         }
-        public void setMessage(OpenAiChatCompletionMessage message) {
+        public void setMessage(ChatCompletionMessage message) {
             this.message = message;
         }
         public String getFinishReason() {
@@ -101,7 +105,7 @@ public class OpenAiChatCompletionResponse {
         
     }
 
-    public static class ResponseBodyUsage {
+    public static class OpenAiChatCompletionResponseUsage {
     
         @JsonProperty("prompt_tokens")
         private int promptTokens;

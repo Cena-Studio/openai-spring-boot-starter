@@ -21,8 +21,6 @@ public class OpenAiSource {
 
         this.chatCompletionProperties = chatCompletionProperties;
 
-        System.out.println(this.chatCompletionProperties.getModel());
-        System.out.println(this.chatCompletionProperties.getTemperature());
     }
 
     public OpenAiSource(String httpHeaderAuthorization, String httpHeaderOpenAiOrganization){

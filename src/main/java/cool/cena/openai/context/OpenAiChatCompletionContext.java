@@ -5,7 +5,7 @@ import java.util.List;
 
 import cool.cena.openai.OpenAiApiAccessor;
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
-import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionMessage;
+import cool.cena.openai.pojo.chatcompletion.ChatCompletionMessage;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponse;
 
@@ -16,8 +16,7 @@ public class OpenAiChatCompletionContext {
 
     private int contextVersion;
 
-    private List<OpenAiChatCompletionMessage> contextMessages;
-    private OpenAiChatCompletionMessage lastContextMessage;
+    private ChatCompletionMessage lastContextMessage;
     
     private List<Segment> segments;
     private int segmentSize, cumulativeToken, maxPromptToken;
@@ -27,8 +26,6 @@ public class OpenAiChatCompletionContext {
         this.requestBody = new OpenAiChatCompletionRequestBody(openAiChatCompletionProperties);
 
         this.contextVersion = 0;
-
-        this.contextMessages = new ArrayList<>();
         
         this.segments = new ArrayList<>();
         this.segmentSize = 0;
@@ -37,42 +34,37 @@ public class OpenAiChatCompletionContext {
 
     }
 
-    private void addMessage(OpenAiChatCompletionMessage newMessage){
+    private void addMessage(ChatCompletionMessage newMessage){
         if(this.lastContextMessage != null && this.lastContextMessage.hasSameRole(newMessage)){
             this.lastContextMessage.merge(newMessage);
         }else{
-            this.contextMessages.add(newMessage);
+            this.requestBody.getMessages().add(newMessage);
             this.lastContextMessage = newMessage;
             this.segmentSize++;
         }
     }
 
     public OpenAiChatCompletionContext addSystemMessage(String newMessageContent){
-        OpenAiChatCompletionMessage newMessage = new OpenAiChatCompletionMessage("system", newMessageContent);
+        ChatCompletionMessage newMessage = new ChatCompletionMessage("system", newMessageContent);
         this.addMessage(newMessage);
         return this;
     }
 
     public OpenAiChatCompletionContext addUserMessage(String newMessageContent){
-        OpenAiChatCompletionMessage newMessage = new OpenAiChatCompletionMessage("user", newMessageContent);
+        ChatCompletionMessage newMessage = new ChatCompletionMessage("user", newMessageContent);
         this.addMessage(newMessage);
         return this;
     }
 
     public OpenAiChatCompletionContext addAssistantMessage(String newMessageContent){
-        OpenAiChatCompletionMessage newMessage = new OpenAiChatCompletionMessage("assistant", newMessageContent);
+        ChatCompletionMessage newMessage = new ChatCompletionMessage("assistant", newMessageContent);
         this.addMessage(newMessage);
         return this;
     }
 
-    public List<OpenAiChatCompletionMessage> getContextMessages(){
-        return this.contextMessages;
-    }
-
-    public OpenAiChatCompletionResponse createChatCompletion(){
+    public OpenAiChatCompletionResponse create(){
         int requestContextVersion = ++this.contextVersion;
 
-        requestBody.setMessages(this.contextMessages);
         OpenAiChatCompletionResponse response = this.apiAccessor.sendChatCompletionRequest(requestBody);
 
         // the following lines execute after the response from opanAiApiAccessor received
@@ -103,7 +95,7 @@ public class OpenAiChatCompletionContext {
 
                 this.cumulativeToken = responsePromptToken + responseCompletionToken;
 
-                OpenAiChatCompletionMessage responseMessage = response.getObjectMessage();
+                ChatCompletionMessage responseMessage = response.getObjectMessage();
                 this.addMessage(responseMessage);
 
                 this.segmentSize = 0;
@@ -134,15 +126,15 @@ public class OpenAiChatCompletionContext {
         
     }
 
-    public OpenAiChatCompletionResponse createChatCompletion(String newMessageContent){
-        return this.addUserMessage(newMessageContent).createChatCompletion();
+    public OpenAiChatCompletionResponse create(String newMessageContent){
+        return this.addUserMessage(newMessageContent).create();
     }
 
     // token management
     public void reduceContext(){
         int segmentSize = this.segments.get(0).getSize();
         int segmentToken = this.segments.get(0).getToken();
-        this.contextMessages.subList(0, segmentSize).clear();
+        this.requestBody.getMessages().subList(0, segmentSize).clear();
         this.segments.remove(0);
         this.cumulativeToken -= segmentToken;
 
