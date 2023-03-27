@@ -19,6 +19,10 @@ public class OpenAiChatCompletionRequestBody {
     private List<String> stop;
     @JsonProperty("max_tokens")
     private Integer maxCompletionToken;
+    @JsonProperty("presence_penalty")
+    private Double presencePenalty;
+    @JsonProperty("frequency_penalty")
+    private Double frequencyPenalty;
     @JsonProperty("logit_bias")
     Map<Integer, Double> logitBias;
     private List<ChatCompletionMessage> messages;
@@ -31,6 +35,8 @@ public class OpenAiChatCompletionRequestBody {
         this.n = chatCompletionProperties.getN();
         this.stop = chatCompletionProperties.getStop();
         this.maxCompletionToken = chatCompletionProperties.getMaxCompletionToken();
+        this.presencePenalty = chatCompletionProperties.getPresencePenalty();
+        this.frequencyPenalty = chatCompletionProperties.getFrequencyPenalty();
         this.logitBias = chatCompletionProperties.getLogitBias();
         this.messages = new ArrayList<>();
     }
