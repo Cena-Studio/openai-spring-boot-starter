@@ -5,6 +5,7 @@ import java.util.List;
 
 import cool.cena.openai.OpenAiApiAccessor;
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
+import cool.cena.openai.exception.OpenAiChatCompletionOutDatedException;
 import cool.cena.openai.pojo.chatcompletion.ChatCompletionMessage;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponse;
@@ -89,53 +90,36 @@ public class OpenAiChatCompletionContext {
         // the following lines execute after the response from opanAiApiAccessor received
         // current context is the latest context
         if(messageSearchTree.checkLatestVersion(requestVersion)){
+
+            // token process
+            int responsePromptToken = response.getPromptToken();
+            int newPromptToken = responsePromptToken - requestPromptToken;
+            messageSearchTree.setToken(requestVersion, newPromptToken);
+
+            List<OpenAiChatCompletionResponseChoice> responseChoices = response.getChoices();
             
-            int responseBodyStatus = response.getStatus();
-            response.setStatus(responseBodyStatus);
+            // only one choice
+            if(responseChoices.size() == 1){
+                int responseCompletionToken = response.getCompletionToken();
+                ChatCompletionMessage responseMessage = response.getObjectMessage();
+                this.addMessage(responseMessage,responseCompletionToken);
 
-            // normal response
-            if (responseBodyStatus == 200) {
-
-                // token process
-                int responsePromptToken = response.getPromptToken();
-                int newPromptToken = responsePromptToken - requestPromptToken;
-                messageSearchTree.setToken(requestVersion, newPromptToken);
-
-                List<OpenAiChatCompletionResponseChoice> responseChoices = response.getChoices();
-                
-                // only one choice
-                if(responseChoices.size() == 1){
-                    int responseCompletionToken = response.getCompletionToken();
-                    ChatCompletionMessage responseMessage = response.getObjectMessage();
-                    this.addMessage(responseMessage,responseCompletionToken);
-
-                // more than one choice
-                }else{
-                    // insert the first choice into the message search tree and the version
-                    this.addMessage(response.getObjectMessage());
-                    // insert other choices into the message search tree
-                    for(int i = 1; i < responseChoices.size(); i++){
-                        messageSearchTree.insert(requestVersion, response.getObjectMessage(i));
-                    }
+            // more than one choice
+            }else{
+                // insert the first choice into the message search tree and the version
+                this.addMessage(response.getObjectMessage());
+                // insert other choices into the message search tree
+                for(int i = 1; i < responseChoices.size(); i++){
+                    messageSearchTree.insert(requestVersion, response.getObjectMessage(i));
                 }
-            
-                return response;
-
             }
-
-            // request error
-            /* System.out.println("Request " + requestContextVersion + " error: " + response.getErrMessage()); */
     
             return response;
 
         }
 
         // context has been updated during the request
-        System.out.println("Context outdated. Request has been deprecated.");
-        response.setStatus(900);
-        response.setErrMessage("This request has been deprecated because it has been superseded by a new request.");
-
-        return response;
+        throw new OpenAiChatCompletionOutDatedException();
         
     }
 
