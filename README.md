@@ -97,6 +97,7 @@ OpenAiChatCompletionResponse response = chatCompletion.create();
 
 ### 3.2 Ongoing Context
 Though the above example works, it looks stupid since everytime a complete prompt context has to be reconstructed from the beginning. Don't worry, the powerful support of this starter is just beginning to be shown to you.
+
 This time let's make the same two requests about lakes and mountains again, but with another coding:
 ```java
 OpenAiChatCompletionContext chatCompletion = openAiSource.createChatCompletionContext();
@@ -110,6 +111,7 @@ System.out.println(response.getMessage());  // "The highest mountain in Scotland
 As you can see, for each conversation (or chat room, in practical terms), you only need to keep a single `OpenAiChatCompletionContext` instance. The context will help you manage the prompts of the conversation and even control the number of tokens consumed by the prompts during each request to prevent from the error from the OpenAi server that you exceed the max token limit.
 ### 3.3 Concurrent Requests
 In practical, the user may send multiple messages in succession before receiving any response. OpenAI's pattern in its own ChatGPT is to prevent sending the next message before the previous one stops receiving a response. This requires more code in both frontend and Spring Boot application to block the user's messages, and if one response gets stuck, the conversation might be unable to proceed.
+
 Let's see the following example and understand how this starter handle the relevant issue:
 ```java
 @Service
@@ -133,5 +135,6 @@ public class MyService{
 }
 ```
 With the above implementation, given that the user send "largest lake in scotland" and "the highest mountain" in succession so there will be two requests waiting for responses simultineously. Then, when the first response is received, it will be deprecated since it is outdated and an exception will be thrown. The second response, generated based on both the two user prompts, will give a complete reply.
+
 Having this mechanism, other exceptions such as the HTTP exceptions caused by the network connection are also well solved. There is no need to use additional code in the project to prevent a series of subsequent problems caused by a single request response failure. However, if there is necessary logic that must be executed after the request, then the try-catch block can be used to catch the exception. To this end, the starter has also encapsulated the possible exceptions. For details please refer to **[the exception documentation](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/exception.md)**.
 ### 3.3 Change Request Parameters
