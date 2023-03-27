@@ -13,7 +13,7 @@ import cool.cena.openai.exception.OpenAiChatCompletionStatusCodeException;
 import cool.cena.openai.exception.OpenAiChatCompletionUnauthorizedException;
 import cool.cena.openai.exception.OpenAiChatCompletionUnknownException;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
-import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponse;
+import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody;
 
 public class OpenAiApiAccessor {
 
@@ -27,13 +27,13 @@ public class OpenAiApiAccessor {
         this.httpHeaders = httpHeaders;
     }
     
-    public OpenAiChatCompletionResponse sendRequest(OpenAiChatCompletionRequestBody requestBody){
+    public OpenAiChatCompletionResponseBody sendRequest(OpenAiChatCompletionRequestBody requestBody){
 
         HttpEntity<OpenAiChatCompletionRequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
         
         try{
 
-            OpenAiChatCompletionResponse responseBody = this.restTemplate.postForObject(this.CHAT_COMPLETION_URL, requestEntity, OpenAiChatCompletionResponse.class);
+            OpenAiChatCompletionResponseBody responseBody = this.restTemplate.postForObject(this.CHAT_COMPLETION_URL, requestEntity, OpenAiChatCompletionResponseBody.class);
             return responseBody;
         
         }catch(HttpStatusCodeException e){

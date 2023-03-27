@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class OpenAiChatCompletionResponse {
+public class OpenAiChatCompletionResponseBody {
 
     private String id, object, model;
     private Long created;

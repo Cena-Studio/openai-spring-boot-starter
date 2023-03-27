@@ -9,8 +9,8 @@ import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionPrope
 import cool.cena.openai.exception.OpenAiChatCompletionOutDatedException;
 import cool.cena.openai.pojo.chatcompletion.ChatCompletionMessage;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
-import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponse;
-import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponse.OpenAiChatCompletionResponseChoice;
+import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody;
+import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody.OpenAiChatCompletionResponseChoice;
 
 public class OpenAiChatCompletionContext {
 
@@ -135,14 +135,14 @@ public class OpenAiChatCompletionContext {
 
 
     // make requests
-    public OpenAiChatCompletionResponse create(){
+    public OpenAiChatCompletionResponseBody create(){
 
         Version requestVersion = new Version(this.version);
 
         PromptMessage promptMessage = messageSearchTree.getPromptMessage(this.version, this.maxPromptToken);
         int requestPromptToken = promptMessage.promptToken;
         requestBody.setMessages(promptMessage.promptMessages);
-        OpenAiChatCompletionResponse response = this.apiAccessor.sendRequest(requestBody);
+        OpenAiChatCompletionResponseBody response = this.apiAccessor.sendRequest(requestBody);
 
         // the following lines execute after the response from opanAiApiAccessor received
         // current context is the latest context
@@ -180,7 +180,7 @@ public class OpenAiChatCompletionContext {
         
     }
 
-    public OpenAiChatCompletionResponse create(String newMessageContent){
+    public OpenAiChatCompletionResponseBody create(String newMessageContent){
         return this.addUserMessage(newMessageContent).create();
     }
 

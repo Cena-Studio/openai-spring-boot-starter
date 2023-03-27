@@ -48,5 +48,32 @@ public class MyService{
 }
 ```
 ## 3 Chat Completion
+A chat completion could be seen as a completion of a conversation context, which is also the core of ChatGPT. This starter offers a good management of the context by using a "message tree".
+### 3.1 Basic Usage
+Assuming the OpenAiSource has been autowired in a class and there is a "myMethod()" method inside that class, a simple way to create a chat completion based on OpenAPI spec could be seen below:
+```java
+public void MyMethod(){
 
+    // create a chat completion context for requests
+    OpenAiChatCompletionContext chatCompletion = openAiSource.createChatCompletionContext();
+    
+    // request for a chat completion with a message "Hello GPT"
+    OpenAiChatCompletionResponse chatCompletionResponse = chatCompletion.create("Hello GPT");
+
+    // GPT responds you with message "Hi, what can I do for you?"
+
+}
+```
+The `OpenAiChatCompletionResponse` instance is strictly encapsulated according to the response body structure provided by OpenAI, and the property names follow Java camel case conventions. You can use getters directly to retrieve any properties you need from the instance. For example:
+```java
+    // retrieve the message content "Hi, what can I do for you?"
+    String messageContent = chatCompletionResponse.getChoices().get(0).getMessage().getContent();
+    // retrieve the token consumed by the prompt
+    int promptTokens = chatCompletionResponse.getUsage().getPromptTokens();
+```
+However, retrieving the message content using the above approach might be tedious. Alternatively, you may use a shortcut method provided by this starter:
+```java
+    // retrieve the message content "Hi, what can I do for you?" using a shortcut
+    String message = chatCompletionResponse.getMessage();
+```
 
