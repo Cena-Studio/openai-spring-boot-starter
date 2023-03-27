@@ -14,6 +14,8 @@ public class OpenAiChatCompletionRequestBody {
     private Double temperature;
     @JsonProperty("top_p")
     private Double topP;
+    private Integer n;
+    private List<String> stop;
     @JsonProperty("max_tokens")
     private Integer maxCompletionToken;
     private List<ChatCompletionMessage> messages;
@@ -23,6 +25,8 @@ public class OpenAiChatCompletionRequestBody {
         this.user = chatCompletionProperties.getUser();
         this.temperature = chatCompletionProperties.getTemperature();
         this.topP = chatCompletionProperties.getTopP();
+        this.n = chatCompletionProperties.getN();
+        this.stop = chatCompletionProperties.getStop();
         this.maxCompletionToken = chatCompletionProperties.getMaxCompletionToken();
         this.messages = new ArrayList<>();
     }
@@ -74,5 +78,22 @@ public class OpenAiChatCompletionRequestBody {
     public void setMessages(List<ChatCompletionMessage> messages) {
         this.messages = messages;
     }
+
+    public Integer getN() {
+        return n;
+    }
+
+    public void setN(Integer n) {
+        this.n = n;
+    }
+
+    public List<String> getStop() {
+        return stop;
+    }
+
+    public void setStop(List<String> stop) {
+        this.stop = stop;
+    }
+    
     
 }

@@ -49,7 +49,7 @@ public class OpenAiProperties {
         private Double temperature;
         private Double topP;
     
-        private Double n;
+        private Integer n;
         private boolean stream;
 
         private List<String> stop;
@@ -59,10 +59,10 @@ public class OpenAiProperties {
 
         @DecimalMin("-2.0")
         @DecimalMax("2.0")
-        private Double presencePenalty;
+        private Double presencePenalty = 0.0;
         @DecimalMin("-2.0")
         @DecimalMax("2.0")
-        private Double frequencyPenalty;
+        private Double frequencyPenalty = 0.0;
 
         private Map<String, Integer> logitBias;
         private String user;
@@ -85,10 +85,10 @@ public class OpenAiProperties {
         public void setTopP(Double topP) {
             this.topP = topP;
         }
-        public Double getN() {
+        public Integer getN() {
             return n;
         }
-        public void setN(Double n) {
+        public void setN(Integer n) {
             this.n = n;
         }
         public boolean isStream() {
