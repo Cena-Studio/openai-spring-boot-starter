@@ -6,8 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class OpenAiChatCompletionResponse {
 
-    private int status;
-    private String id, object, model, errMessage;
+    private String id, object, model;
     private Long created;
     private List<OpenAiChatCompletionResponseChoice> choices;
     private OpenAiChatCompletionResponseUsage usage;
@@ -61,22 +60,6 @@ public class OpenAiChatCompletionResponse {
         this.choices = choices;
     }
 
-    public String getErrMessage() {
-        return errMessage;
-    }
-
-    public void setErrMessage(String errMessage) {
-        this.errMessage = errMessage;
-    }
-
-    public int getStatus(){
-        return this.status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     public int getPromptToken(){
         return this.usage.getPromptTokens();
     }
@@ -98,10 +81,7 @@ public class OpenAiChatCompletionResponse {
     }
 
     public String getMessage(int choice){
-        if (this.status == 200) {
-            return this.choices.get(choice).getMessage().getContent();
-        }
-        return null;
+        return this.choices.get(choice).getMessage().getContent();
     }
 
     public static class OpenAiChatCompletionResponseChoice {

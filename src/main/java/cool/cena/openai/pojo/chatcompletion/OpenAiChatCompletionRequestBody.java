@@ -2,6 +2,7 @@ package cool.cena.openai.pojo.chatcompletion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,6 +19,8 @@ public class OpenAiChatCompletionRequestBody {
     private List<String> stop;
     @JsonProperty("max_tokens")
     private Integer maxCompletionToken;
+    @JsonProperty("logit_bias")
+    Map<Integer, Double> logitBias;
     private List<ChatCompletionMessage> messages;
 
     public OpenAiChatCompletionRequestBody(OpenAiChatCompletionProperties chatCompletionProperties) {
@@ -28,6 +31,7 @@ public class OpenAiChatCompletionRequestBody {
         this.n = chatCompletionProperties.getN();
         this.stop = chatCompletionProperties.getStop();
         this.maxCompletionToken = chatCompletionProperties.getMaxCompletionToken();
+        this.logitBias = chatCompletionProperties.getLogitBias();
         this.messages = new ArrayList<>();
     }
 

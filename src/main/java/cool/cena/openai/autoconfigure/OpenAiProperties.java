@@ -64,7 +64,7 @@ public class OpenAiProperties {
         @DecimalMax("2.0")
         private Double frequencyPenalty = 0.0;
 
-        private Map<String, Integer> logitBias;
+        private Map<Integer, Double> logitBias;
         private String user;
         
         public String getModel() {
@@ -127,10 +127,10 @@ public class OpenAiProperties {
         public void setFrequencyPenalty(Double frequencyPenalty) {
             this.frequencyPenalty = frequencyPenalty;
         }
-        public Map<String, Integer> getLogitBias() {
+        public Map<Integer, Double> getLogitBias() {
             return logitBias;
         }
-        public void setLogitBias(Map<String, Integer> logitBias) {
+        public void setLogitBias(Map<Integer, Double> logitBias) {
             this.logitBias = logitBias;
         }
         public String getUser() {
