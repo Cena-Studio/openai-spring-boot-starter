@@ -29,7 +29,6 @@ public class OpenAiChatCompletionContext {
     private void addMessage(ChatCompletionMessage newMessage){
         Version newVersion = messageSearchTree.insert(this.version, newMessage);
         this.version = newVersion;
-        messageSearchTree.print(this.version);
     }
 
     private void addMessage(ChatCompletionMessage newMessage, int token){
@@ -99,7 +98,7 @@ public class OpenAiChatCompletionContext {
         }
 
         // context has been updated during the request
-        /* System.out.println("Context outdated. Request " + requestContextVersion + " has been deprecated."); */
+        System.out.println("Context outdated. Request has been deprecated.");
         response.setStatus(900);
         response.setErrMessage("This request has been deprecated because it has been superseded by a new request.");
 
@@ -121,6 +120,7 @@ public class OpenAiChatCompletionContext {
 
         // construct a version instance by copying an existing version
         private Version(Version version){
+            this.path = new ArrayList<>();
             for(Integer location: version.path){
                 this.path.add(location);
             }
@@ -183,6 +183,7 @@ public class OpenAiChatCompletionContext {
     
         private PromptMessage getPromptMessage(Version version, int maxToken){
     
+            System.out.println(version);
             MessageNode pathNode;
             List<MessageNode> pathChilds = root;
             List<MessageNode> promptNodes = new ArrayList<>();
@@ -205,10 +206,11 @@ public class OpenAiChatCompletionContext {
                 pathChilds = pathNode.childs;
     
             }
-    
+
             // form the promptNodes to promptMessages
             List<ChatCompletionMessage> promptMessages = new ArrayList<>();
             for(MessageNode promptNode : promptNodes){
+                System.out.println("token: " + promptNode.token + " / role: " + promptNode.message.getRole() + " / content: " + promptNode.message.getContent().substring(0, 3));
                 promptMessages.add(promptNode.message);
             }
     
@@ -236,17 +238,6 @@ public class OpenAiChatCompletionContext {
                 pathChilds = pathNode.childs;
             }
             pathNode.token = token;
-        }
-
-        private void print(Version version){
-            System.out.println(version);
-            MessageNode pathNode;
-            List<MessageNode> pathChilds = root;
-            for (int i = 0; i < version.path.size(); i++) {
-                pathNode = pathChilds.get(version.path.get(i));
-                System.out.println("token: " + pathNode.token + "role: " + pathNode.message.getRole() + "content: " + pathNode.message.getContent().substring(0, 5));
-                pathChilds = pathNode.childs;
-            }
         }
     
         private static class MessageNode{
