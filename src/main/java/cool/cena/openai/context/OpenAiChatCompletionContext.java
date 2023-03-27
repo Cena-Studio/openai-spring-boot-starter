@@ -2,6 +2,7 @@ package cool.cena.openai.context;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import cool.cena.openai.OpenAiApiAccessor;
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
@@ -19,6 +20,7 @@ public class OpenAiChatCompletionContext {
     private Version version;
     private Integer maxPromptToken;
 
+    // constructor
     public OpenAiChatCompletionContext(OpenAiApiAccessor apiAccessor, OpenAiChatCompletionProperties openAiChatCompletionProperties) {
         this.apiAccessor = apiAccessor;
         this.requestBody = new OpenAiChatCompletionRequestBody(openAiChatCompletionProperties);
@@ -28,17 +30,67 @@ public class OpenAiChatCompletionContext {
 
     }
 
+
+
+    // set request parameters
+    public OpenAiChatCompletionContext setModel(String model) {
+        this.requestBody.setModel(model);
+        return this;
+    }
+
+    public OpenAiChatCompletionContext setUser(String user) {
+        this.requestBody.setUser(user);
+        return this;
+    }
+    public OpenAiChatCompletionContext setTemperature(Double temperature) {
+        this.requestBody.setTemperature(temperature);
+        return this;
+    }
+    public OpenAiChatCompletionContext setTopP(Double topP) {
+        this.requestBody.setTopP(topP);
+        return this;
+    }
+    public OpenAiChatCompletionContext setMaxPromptToken(Integer maxPromptToken) {
+        this.maxPromptToken = maxPromptToken;
+        return this;
+    }
+    public OpenAiChatCompletionContext setMaxCompletionToken(Integer maxCompletionToken) {
+        this.requestBody.setMaxCompletionToken(maxCompletionToken);
+        return this;
+    }
+    public OpenAiChatCompletionContext setN(Integer n) {
+        this.requestBody.setN(n);
+        return this;
+    }
+    public OpenAiChatCompletionContext setPresencePenalty(Double presencePenalty) {
+        this.requestBody.setPresencePenalty(presencePenalty);
+        return this;
+    }
+    public OpenAiChatCompletionContext setFrequencyPenalty(Double frequencyPenalty) {
+        this.requestBody.setFrequencyPenalty(frequencyPenalty);
+        return this;
+    }
+    public OpenAiChatCompletionContext setLogitBias(Map<Integer, Double> logitBias) {
+        this.requestBody.setLogitBias(logitBias);
+        return this;
+    }
+    public OpenAiChatCompletionContext setStop(List<String> stop) {
+        this.requestBody.setStop(stop);
+        return this;
+    }
+
+
+
+    // insert message
     private void addMessage(ChatCompletionMessage newMessage){
         Version newVersion = messageSearchTree.insert(this.version, newMessage);
         this.version = newVersion;
-        System.out.print("new ");
         messageSearchTree.print(this.version);
     }
 
     private void addMessage(ChatCompletionMessage newMessage, int token){
         Version newVersion = messageSearchTree.insert(this.version, newMessage, token);
         this.version = newVersion;
-        System.out.print("new ");
         messageSearchTree.print(this.version);
     }
 
@@ -60,6 +112,9 @@ public class OpenAiChatCompletionContext {
         return this;
     }
 
+
+
+    // version control
     public Version getVersion(){
         return this.version;
     }
@@ -67,7 +122,6 @@ public class OpenAiChatCompletionContext {
     public OpenAiChatCompletionContext switchVersion(int n){
         this.version = this.version.translate(n);
         messageSearchTree.refresh(this.version);
-        System.out.print("switch to ");
         messageSearchTree.print(this.version);
         return this;
     }
@@ -78,6 +132,9 @@ public class OpenAiChatCompletionContext {
         return this;
     }
 
+
+
+    // make requests
     public OpenAiChatCompletionResponse create(){
 
         Version requestVersion = new Version(this.version);
@@ -127,6 +184,9 @@ public class OpenAiChatCompletionContext {
         return this.addUserMessage(newMessageContent).create();
     }
 
+
+
+    // inner classes
     public static class Version{  
     
         private List<Integer> path;
@@ -276,12 +336,10 @@ public class OpenAiChatCompletionContext {
 
         private void print(Version version){
             
-            System.out.println(version);
             MessageNode pathNode = null;
             List<MessageNode> pathChilds = root;
             for (int i = 0; i < version.path.size(); i++) {
                 pathNode = pathChilds.get(version.path.get(i));
-                System.out.println("token: " + pathNode.token + " / role: " + pathNode.message.getRole() + " / content: " + pathNode.message.getContent().substring(0, 3));
                 pathChilds = pathNode.childs;
             }
         }

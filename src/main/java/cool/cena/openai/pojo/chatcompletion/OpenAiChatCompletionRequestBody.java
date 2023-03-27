@@ -104,6 +104,30 @@ public class OpenAiChatCompletionRequestBody {
     public void setStop(List<String> stop) {
         this.stop = stop;
     }
+
+    public Double getPresencePenalty() {
+        return presencePenalty;
+    }
+
+    public void setPresencePenalty(Double presencePenalty) {
+        this.presencePenalty = presencePenalty;
+    }
+
+    public Double getFrequencyPenalty() {
+        return frequencyPenalty;
+    }
+
+    public void setFrequencyPenalty(Double frequencyPenalty) {
+        this.frequencyPenalty = frequencyPenalty;
+    }
+
+    public Map<Integer, Double> getLogitBias() {
+        return logitBias;
+    }
+
+    public void setLogitBias(Map<Integer, Double> logitBias) {
+        this.logitBias = logitBias;
+    }
     
     
 }
