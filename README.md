@@ -43,13 +43,13 @@ import cool.cena.openai.OpenAiSource;
 public class MyService{
 
     @Autowired
-    OpenAiSource openAiSource
+    OpenAiSource openAiSource;
 
 }
 ```
 ## 3 Chat Completion
 A chat completion could be seen as a completion of a conversation context, which is also the core of ChatGPT. This starter offers a good management of the context by using a "message tree".
-### 3.1 Basic Usage
+### 3.1 Simple Usage
 Assuming the OpenAiSource has been autowired in a class and there is a "myMethod()" method inside that class, a simple way to create a chat completion based on OpenAPI spec could be seen below:
 ```java
 public void MyMethod(){
@@ -57,23 +57,81 @@ public void MyMethod(){
     // create a chat completion context for requests
     OpenAiChatCompletionContext chatCompletion = openAiSource.createChatCompletionContext();
     
-    // request for a chat completion with a message "Hello GPT"
-    OpenAiChatCompletionResponse chatCompletionResponse = chatCompletion.create("Hello GPT");
+    // add a single prompt to the context
+    chatCompletion.addUserMessage("Which is the largest lake in scotland");
+    
+    // request for a chat completion with the prompt
+    OpenAiChatCompletionResponse response = chatCompletion.create();
 
-    // GPT responds you with message "Hi, what can I do for you?"
+    // GPT responds you with message "The largest lake in Scotland is actually Loch Lomond."
 
 }
 ```
 The `OpenAiChatCompletionResponse` instance is strictly encapsulated according to the response body structure provided by OpenAI, and the property names follow Java camel case conventions. You can use getters directly to retrieve any properties you need from the instance. For example:
 ```java
-    // retrieve the message content "Hi, what can I do for you?"
-    String messageContent = chatCompletionResponse.getChoices().get(0).getMessage().getContent();
-    // retrieve the token consumed by the prompt
-    int promptTokens = chatCompletionResponse.getUsage().getPromptTokens();
+// retrieve the message content "The largest lake in Scotland is actually Loch Lomond"
+String messageContent = response.getChoices().get(0).getMessage().getContent();
+// retrieve the token consumed by the prompt
+int promptTokens = response.getUsage().getPromptTokens();
 ```
 However, retrieving the message content using the above approach might be tedious. Alternatively, you may use a shortcut method provided by this starter:
 ```java
-    // retrieve the message content "Hi, what can I do for you?" using a shortcut
-    String message = chatCompletionResponse.getMessage();
+// retrieve the message content "The largest lake in Scotland is actually Loch Lomond" using a shortcut
+String message = response.getMessage();
+```
+If we want to follow up on the topic and ask "what about the highest mountain". According to the context, GPT should respond with the highest mountain in Scotland instead of the highest one in the whole world. To manually realize such feature, we may use the following code (soon you will learn in Section 3.2 that there are much better ways to achieve this):
+```java
+// create a chat completion context for requests
+OpenAiChatCompletionContext chatCompletion = openAiSource.createChatCompletionContext();
+
+// add a single prompt to the context
+chatCompletion.addUserMessage("Which is the largest lake in scotland")
+    .addAssistantMessage("The largest lake in Scotland is actually Loch Lomond")
+    .addUserMessage("What about the highest mountain?");
+
+// request for a chat completion with the prompt
+OpenAiChatCompletionResponse response = chatCompletion.create();
+
+// GPT responds you with message "The highest mountain in Scotland is Ben Nevis."
 ```
 
+### 3.2 Ongoing Context
+Though the above example works, it looks stupid since everytime a complete prompt context has to be reconstructed from the beginning. Don't worry, the powerful support of this starter is just beginning to be shown to you.
+This time let's make the same two requests about lakes and mountains again, but with another coding:
+```java
+OpenAiChatCompletionContext chatCompletion = openAiSource.createChatCompletionContext();
+
+OpenAiChatCompletionResponse response = chatCompletion.create("Which is the largest lake in scotland");
+System.out.println(response.getMessage());  // "The largest lake in Scotland is actually Loch Lomond."
+
+response = chatCompletion.create("What about the highest mountain?");
+System.out.println(response.getMessage());  // "The highest mountain in Scotland is Ben Nevis."
+```
+As you can see, for each conversation (or chat room, in practical terms), you only need to keep a single `OpenAiChatCompletionContext` instance. The context will help you manage the prompts of the conversation and even control the number of tokens consumed by the prompts during each request to prevent from the error from the OpenAi server that you exceed the max token limit.
+### 3.3 Concurrent Requests
+In practical, the user may send multiple messages in succession before receiving any response. OpenAI's pattern in its own ChatGPT is to prevent sending the next message before the previous one stops receiving a response. This requires more code in both frontend and Spring Boot application to block the user's messages, and if one response gets stuck, the conversation might be unable to proceed.
+Let's see the following example and understand how this starter handle the relevant issue:
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+    Map<Integer, OpenAiChatCompletionContext> contextMap;  // just an example, assuming we save contexts of several conversations in a map
+
+    public void MyMethod(int conversationId, String userMessage){
+        
+        OpenAiChatCompletionContext chatCompletion = contextMap.get(conversationId);
+        // user send "Which is the largest lake in scotland" and triggered request_1
+        // user send "What about the highest mountain?" and triggered request_2
+        OpenAiChatCompletionResponse response = chatCompletion.create(userMessage);
+
+        System.out.println(response.getMessage());  // "The largest lake in Scotland is Loch Lomond and the highest mountain in Scotland is Ben Nevis."
+
+    }
+
+}
+```
+With the above implementation, given that the user send "largest lake in scotland" and "the highest mountain" in succession so there will be two requests waiting for responses simultineously. Then, when the first response is received, it will be deprecated since it is outdated and an exception will be thrown. The second response, generated based on both the two user prompts, will give a complete reply.
+Having this mechanism, other exceptions such as the HTTP exceptions caused by the network connection are also well solved. There is no need to use additional code in the project to prevent a series of subsequent problems caused by a single request response failure. However, if there is necessary logic that must be executed after the request, then the try-catch block can be used to catch the exception. To this end, the starter has also encapsulated the possible exceptions. For details please refer to **[the exception documentation](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/exception.md)**.
+### 3.3 Change Request Parameters
