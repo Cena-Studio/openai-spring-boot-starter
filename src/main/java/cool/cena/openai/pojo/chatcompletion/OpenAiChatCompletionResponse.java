@@ -9,32 +9,55 @@ public class OpenAiChatCompletionResponse {
     private int status;
     private String id, object, model, errMessage;
     private Long created;
-    private List<OpenAiChatCompletionResponseChoices> choices;
+    private List<OpenAiChatCompletionResponseChoice> choices;
     private OpenAiChatCompletionResponseUsage usage;
 
     // getters and setters
+    public String getId(){
+        return this.id;
+    }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getObject(){
+        return this.object;
     }
 
     public void setObject(String object) {
         this.object = object;
     }
 
+    public String getModel(){
+        return this.model;
+    }
+
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public Long getCreated(){
+        return this.created;
     }
 
     public void setCreated(Long created) {
         this.created = created;
     }
 
+    public OpenAiChatCompletionResponseUsage getUsage(){
+        return this.usage;
+    }
+
     public void setUsage(OpenAiChatCompletionResponseUsage usage) {
         this.usage = usage;
     }
     
-    public void setChoices(List<OpenAiChatCompletionResponseChoices> choices) {
+    public List<OpenAiChatCompletionResponseChoice> getChoices(){
+        return this.choices;
+    }
+
+    public void setChoices(List<OpenAiChatCompletionResponseChoice> choices) {
         this.choices = choices;
     }
 
@@ -63,7 +86,11 @@ public class OpenAiChatCompletionResponse {
     }
 
     public ChatCompletionMessage getObjectMessage(){
-        return this.choices.get(0).getMessage();
+        return this.getObjectMessage(0);
+    }
+
+    public ChatCompletionMessage getObjectMessage(int choice){
+        return this.choices.get(choice).getMessage();
     }
 
     public String getMessage(){
@@ -77,7 +104,7 @@ public class OpenAiChatCompletionResponse {
         return null;
     }
 
-    public static class OpenAiChatCompletionResponseChoices {
+    public static class OpenAiChatCompletionResponseChoice {
     
         private int index;
         private ChatCompletionMessage message;

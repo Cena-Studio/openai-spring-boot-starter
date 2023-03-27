@@ -23,7 +23,7 @@ public class OpenAiApiAccessor {
         this.httpHeaders = httpHeaders;
     }
     
-    public OpenAiChatCompletionResponse sendChatCompletionRequest(OpenAiChatCompletionRequestBody requestBody){
+    public OpenAiChatCompletionResponse sendRequest(OpenAiChatCompletionRequestBody requestBody){
 
         HttpEntity<OpenAiChatCompletionRequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
         
