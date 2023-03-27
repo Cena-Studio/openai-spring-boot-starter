@@ -13,35 +13,28 @@ public class OpenAiChatCompletionContext {
 
     private OpenAiApiAccessor apiAccessor;
     private OpenAiChatCompletionRequestBody requestBody;
-
-    private int contextVersion;
-
-    private ChatCompletionMessage lastContextMessage;
-    
-    private List<Segment> segments;
-    private int segmentSize, cumulativeToken, maxPromptToken;
+    private MessageSearchTree messageSearchTree;
+    private Version version;
+    private Integer maxPromptToken;
 
     public OpenAiChatCompletionContext(OpenAiApiAccessor apiAccessor, OpenAiChatCompletionProperties openAiChatCompletionProperties) {
         this.apiAccessor = apiAccessor;
         this.requestBody = new OpenAiChatCompletionRequestBody(openAiChatCompletionProperties);
-
-        this.contextVersion = 0;
-        
-        this.segments = new ArrayList<>();
-        this.segmentSize = 0;
-        this.cumulativeToken = 0;
         this.maxPromptToken = openAiChatCompletionProperties.getMaxPromptToken();
+        this.messageSearchTree = new MessageSearchTree();
+        this.version = new Version(new ArrayList<>());
 
     }
 
     private void addMessage(ChatCompletionMessage newMessage){
-        if(this.lastContextMessage != null && this.lastContextMessage.hasSameRole(newMessage)){
-            this.lastContextMessage.merge(newMessage);
-        }else{
-            this.requestBody.getMessages().add(newMessage);
-            this.lastContextMessage = newMessage;
-            this.segmentSize++;
-        }
+        Version newVersion = messageSearchTree.insert(this.version, newMessage);
+        this.version = newVersion;
+        messageSearchTree.print(this.version);
+    }
+
+    private void addMessage(ChatCompletionMessage newMessage, int token){
+        Version newVersion = messageSearchTree.insert(this.version, newMessage, token);
+        this.version = newVersion;
     }
 
     public OpenAiChatCompletionContext addSystemMessage(String newMessageContent){
@@ -62,14 +55,22 @@ public class OpenAiChatCompletionContext {
         return this;
     }
 
-    public OpenAiChatCompletionResponse create(){
-        int requestContextVersion = ++this.contextVersion;
+    public Version getVersion(){
+        return this.version;
+    }
 
+    public OpenAiChatCompletionResponse create(){
+
+        Version requestVersion = new Version(this.version);
+
+        PromptMessage promptMessage = messageSearchTree.getPromptMessage(this.version, this.maxPromptToken);
+        int requestPromptToken = promptMessage.promptToken;
+        requestBody.setMessages(promptMessage.promptMessages);
         OpenAiChatCompletionResponse response = this.apiAccessor.sendChatCompletionRequest(requestBody);
 
         // the following lines execute after the response from opanAiApiAccessor received
         // current context is the latest context
-        if(requestContextVersion == this.contextVersion){
+        if(messageSearchTree.checkLatestVersion(requestVersion)){
             
             int responseBodyStatus = response.getStatus();
             response.setStatus(responseBodyStatus);
@@ -77,48 +78,28 @@ public class OpenAiChatCompletionContext {
             // normal response
             if (responseBodyStatus == 200) {
 
-                System.out.println("Request " + requestContextVersion + " success. Message: " + response.getObjectMessage().getContent());
-
                 // token process
                 int responsePromptToken = response.getPromptToken();
-                int segmentToken = responsePromptToken - this.cumulativeToken;
-                Segment promptSegment = new Segment(segmentSize, segmentToken);
-                segments.add(promptSegment);
+                int newPromptToken = responsePromptToken - requestPromptToken;
+                messageSearchTree.setToken(requestVersion, newPromptToken);
 
-                System.out.println("ps added. size: " + segmentSize + " token: " + segmentToken);
-        
                 int responseCompletionToken = response.getCompletionToken();
-                Segment completionSegment = new Segment(1, responseCompletionToken);
-                segments.add(completionSegment);
-    
-                System.out.println("cs added. size: " + 1 + " token: " + responseCompletionToken);
-
-                this.cumulativeToken = responsePromptToken + responseCompletionToken;
-
                 ChatCompletionMessage responseMessage = response.getObjectMessage();
-                this.addMessage(responseMessage);
-
-                this.segmentSize = 0;
-
-                System.out.println("cumulative token: " + this.cumulativeToken);
-
-                while(this.cumulativeToken > this.maxPromptToken){
-                    this.reduceContext();
-                }
+                this.addMessage(responseMessage,responseCompletionToken);
             
                 return response;
 
             }
 
             // request error
-            System.out.println("Request " + requestContextVersion + " error: " + response.getErrMessage());
+            /* System.out.println("Request " + requestContextVersion + " error: " + response.getErrMessage()); */
     
             return response;
 
         }
 
         // context has been updated during the request
-        System.out.println("Context outdated. Request " + requestContextVersion + " has been deprecated.");
+        /* System.out.println("Context outdated. Request " + requestContextVersion + " has been deprecated."); */
         response.setStatus(900);
         response.setErrMessage("This request has been deprecated because it has been superseded by a new request.");
 
@@ -130,32 +111,156 @@ public class OpenAiChatCompletionContext {
         return this.addUserMessage(newMessageContent).create();
     }
 
-    // token management
-    public void reduceContext(){
-        int segmentSize = this.segments.get(0).getSize();
-        int segmentToken = this.segments.get(0).getToken();
-        this.requestBody.getMessages().subList(0, segmentSize).clear();
-        this.segments.remove(0);
-        this.cumulativeToken -= segmentToken;
+    public static class Version{  
+    
+        private List<Integer> path;
 
-        System.out.println("segment removed. current token: " + this.cumulativeToken);
+        private Version(List<Integer> path) {
+            this.path = path;
+        }
+
+        // construct a version instance by copying an existing version
+        private Version(Version version){
+            for(Integer location: version.path){
+                this.path.add(location);
+            }
+        }
+
+        public String toString(){
+            String returnString = "context version: ";
+            for(Integer location : path){
+                returnString += location + "-";
+            }
+            return returnString;
+        }
     }
 
-    private static class Segment {
+    private static class PromptMessage{
+    
+        private List<ChatCompletionMessage> promptMessages;
+        private int promptToken;
 
-        private int size, token;
+        private PromptMessage(List<ChatCompletionMessage> promptMessages, int promptToken) {
+            this.promptMessages = promptMessages;
+            this.promptToken = promptToken;
+        }
+
+    }
+
+    private static class MessageSearchTree {
+    
+        private List<MessageNode> root;
+    
+        private MessageSearchTree(){
+            this.root = new ArrayList<>();
+        }
+    
+        private Version insert(Version version, ChatCompletionMessage message){
+    
+            return this.insert(version, message, 0);
+    
+        }
         
-        public Segment(int size, int token){
-            this.size = size;
-            this.token = token;
+        private Version insert(Version version, ChatCompletionMessage message, int token){
+    
+            MessageNode pathNode;
+            List<MessageNode> pathChilds = root;
+            for (int i = 0; i < version.path.size(); i++) {
+                pathNode = pathChilds.get(version.path.get(i));
+                pathChilds = pathNode.childs;
+            }
+    
+            List<Integer> newPath = new ArrayList<>();
+            newPath.addAll(version.path);
+            newPath.add(pathChilds.size());
+    
+            MessageNode newNode = new MessageNode(message, token);
+            pathChilds.add(newNode);
+    
+            return new Version(newPath);
+    
         }
     
-        public int getSize() {
-            return size;
+        private PromptMessage getPromptMessage(Version version, int maxToken){
+    
+            MessageNode pathNode;
+            List<MessageNode> pathChilds = root;
+            List<MessageNode> promptNodes = new ArrayList<>();
+    
+            // iteratively add the nodes on the path into a template arraylist and control the token consumption
+            int cumulativeToken = 0;
+            for (int i = 0; i < version.path.size(); i++) {
+                // add the current path node into the template arraylist
+                pathNode = pathChilds.get(version.path.get(i));
+                promptNodes.add(pathNode);
+    
+                // control the token consumption of the prompt to meet the maximum token limit
+                cumulativeToken += pathNode.token;
+                while(cumulativeToken > maxToken){
+                    int reducedToken = promptNodes.remove(0).token;
+                    cumulativeToken -= reducedToken;
+                }
+                
+                // get children of the current path node
+                pathChilds = pathNode.childs;
+    
+            }
+    
+            // form the promptNodes to promptMessages
+            List<ChatCompletionMessage> promptMessages = new ArrayList<>();
+            for(MessageNode promptNode : promptNodes){
+                promptMessages.add(promptNode.message);
+            }
+    
+            return new PromptMessage(promptMessages, cumulativeToken);
+    
+        }
+
+        private boolean checkLatestVersion(Version version){
+            MessageNode pathNode;
+            List<MessageNode> pathChilds = root;
+            for (int i = 0; i < version.path.size(); i++) {
+                pathNode = pathChilds.get(version.path.get(i));
+                pathChilds = pathNode.childs;
+            }
+
+            return pathChilds.size() == 0;
+        }
+
+        private void setToken(Version version, int token){
+            
+            MessageNode pathNode = null;
+            List<MessageNode> pathChilds = root;
+            for (int i = 0; i < version.path.size(); i++) {
+                pathNode = pathChilds.get(version.path.get(i));
+                pathChilds = pathNode.childs;
+            }
+            pathNode.token = token;
+        }
+
+        private void print(Version version){
+            System.out.println(version);
+            MessageNode pathNode;
+            List<MessageNode> pathChilds = root;
+            for (int i = 0; i < version.path.size(); i++) {
+                pathNode = pathChilds.get(version.path.get(i));
+                System.out.println("token: " + pathNode.token + "role: " + pathNode.message.getRole() + "content: " + pathNode.message.getContent().substring(0, 5));
+                pathChilds = pathNode.childs;
+            }
         }
     
-        public int getToken() {
-            return token;
+        private static class MessageNode{
+    
+            private List<MessageNode> childs;
+            private ChatCompletionMessage message;
+            private int token;
+        
+            private MessageNode(ChatCompletionMessage message, int token) {
+                this.childs = new ArrayList<>();
+                this.message = message;
+                this.token = token;
+            }
+    
         }
         
     }
