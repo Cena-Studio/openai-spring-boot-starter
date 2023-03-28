@@ -265,4 +265,4 @@ chatCompletionOne.switchVersion(earlyVersion);
 // ERROR because the latestVersion no longer exists
 chatCompletionOne.switchVersion(latestVersion);
 ```
-ATTENTION: When rolling back to an early version, the child branches will be discarded to keep the context safe. Developers should be careful when switch to a version that is not the latest version of a branch.
+**ATTENTION** When rolling back to an early version, the child branches will be discarded to keep the context safe. Developers should be careful when switch to a version that is not the latest version of a branch.
