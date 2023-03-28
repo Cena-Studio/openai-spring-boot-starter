@@ -5,12 +5,18 @@ This project is an **unofficial** Spring Boot starter for quick access to Open A
 This project is currently established on Spring Boot 3.0.4. Broader version support will be provided based on feedback and demands from the community in the future. In the meantime, please make sure that your Spring Boot project version is compatible with this starter.
 
 ## 2 Development Roadmap
-- Chat Completion ```<- current stage```
-- Text Completion
+- Chat Completion ![completed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/completed.png)**
+    - auto configuration ![completed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/completed.png)**
+    - basic functionality ![completed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/completed.png)**
+    - stream ![postponed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/postponed.png)**
+    - choices ![completed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/completed.png)**
+    - ohter properties ![completed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/completed.png)**
+- Text Completion  ![current stage](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/current_stage.png)**
 - Moderation
 - Image Generation
 - HTTP Connection Configuration
 - Other APIs
+```
 
 # Quick Start
 ## 1 Basic Preparation
@@ -108,7 +114,7 @@ System.out.println(response.getMessage());  // "The largest lake in Scotland is 
 response = chatCompletion.create("What about the highest mountain?");
 System.out.println(response.getMessage());  // "The highest mountain in Scotland is Ben Nevis."
 ```
-As you can see, for each conversation (or chat room, in practical terms), you only need to keep a single `OpenAiChatCompletionContext` instance. The context will help you manage the prompts of the conversation and even control the number of tokens consumed by the prompts during each request to prevent from the error from the OpenAi server that you exceed the max token limit.
+As can be seen, for each conversation (or chat room, in practical terms), only keeping a single `OpenAiChatCompletionContext` instance is needed. The context will help you manage the prompts of the conversation and even control the number of tokens consumed by the prompts during each request to prevent from the error from the OpenAi server that exceeding the max token limit.
 ### 3.3 Concurrent Requests
 In practical, the user may send multiple messages in succession before receiving any response. OpenAI's pattern in its own ChatGPT is to prevent sending the next message before the previous one stops receiving a response. This requires more code in both frontend and Spring Boot application to block the user's messages, and if one response gets stuck, the conversation might be unable to proceed.
 
