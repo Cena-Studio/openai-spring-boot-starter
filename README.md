@@ -39,6 +39,8 @@ public class MyService{
 
 }
 ```
+## 2 Text Completion
+
 ## 3 Chat Completion
 A chat completion could be seen as a completion of a conversation context, which is also the core of ChatGPT. This starter offers a good management of the context by using a "message tree".
 ### 3.1 Simple Usage

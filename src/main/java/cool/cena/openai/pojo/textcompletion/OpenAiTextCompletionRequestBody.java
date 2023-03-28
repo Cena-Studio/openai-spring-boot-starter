@@ -1,4 +1,4 @@
-package cool.cena.openai.pojo.chatcompletion;
+package cool.cena.openai.pojo.textcompletion;
 
 import java.util.List;
 import java.util.Map;
@@ -6,37 +6,39 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
+import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiTextCompletionProperties;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OpenAiChatCompletionRequestBody {
-    private String model, user;
+public class OpenAiTextCompletionRequestBody {
+    private String model, suffix, user, prompt;
+    @JsonProperty("max_tokens")
+    private Integer maxTokens;
     private Double temperature;
     @JsonProperty("top_p")
     private Double topP;
     private Integer n;
+    private boolean echo;
     private List<String> stop;
-    @JsonProperty("max_tokens")
-    private Integer maxCompletionToken;
     @JsonProperty("presence_penalty")
     private Double presencePenalty;
     @JsonProperty("frequency_penalty")
     private Double frequencyPenalty;
     @JsonProperty("logit_bias")
     Map<Integer, Double> logitBias;
-    private List<ChatCompletionMessage> messages;
 
-    public OpenAiChatCompletionRequestBody(OpenAiChatCompletionProperties chatCompletionProperties) {
-        this.model = chatCompletionProperties.getModel();
-        this.user = chatCompletionProperties.getUser();
-        this.temperature = chatCompletionProperties.getTemperature();
-        this.topP = chatCompletionProperties.getTopP();
-        this.n = chatCompletionProperties.getN();
-        this.stop = chatCompletionProperties.getStop();
-        this.maxCompletionToken = chatCompletionProperties.getMaxCompletionToken();
-        this.presencePenalty = chatCompletionProperties.getPresencePenalty();
-        this.frequencyPenalty = chatCompletionProperties.getFrequencyPenalty();
-        this.logitBias = chatCompletionProperties.getLogitBias();
+    public OpenAiTextCompletionRequestBody(OpenAiTextCompletionProperties textCompletionProperties) {
+        this.model = textCompletionProperties.getModel();
+        this.suffix = textCompletionProperties.getSuffix();
+        this.user = textCompletionProperties.getUser();
+        this.maxTokens = textCompletionProperties.getMaxTokens();
+        this.temperature = textCompletionProperties.getTemperature();
+        this.topP = textCompletionProperties.getTopP();
+        this.n = textCompletionProperties.getN();
+        this.echo = textCompletionProperties.isEcho();
+        this.stop = textCompletionProperties.getStop();
+        this.presencePenalty = textCompletionProperties.getPresencePenalty();
+        this.frequencyPenalty = textCompletionProperties.getFrequencyPenalty();
+        this.logitBias = textCompletionProperties.getLogitBias();
     }
 
     public String getModel() {
@@ -47,12 +49,28 @@ public class OpenAiChatCompletionRequestBody {
         this.model = model;
     }
 
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+
     public String getUser() {
         return user;
     }
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public Integer getMaxTokens() {
+        return maxTokens;
+    }
+
+    public void setMaxTokens(Integer maxTokens) {
+        this.maxTokens = maxTokens;
     }
 
     public Double getTemperature() {
@@ -71,28 +89,20 @@ public class OpenAiChatCompletionRequestBody {
         this.topP = topP;
     }
 
-    public Integer getMaxCompletionToken() {
-        return maxCompletionToken;
-    }
-
-    public void setMaxCompletionToken(Integer maxCompletionToken) {
-        this.maxCompletionToken = maxCompletionToken;
-    }
-
-    public List<ChatCompletionMessage> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(List<ChatCompletionMessage> messages) {
-        this.messages = messages;
-    }
-
     public Integer getN() {
         return n;
     }
 
     public void setN(Integer n) {
         this.n = n;
+    }
+
+    public boolean isEcho() {
+        return echo;
+    }
+
+    public void setEcho(boolean echo) {
+        this.echo = echo;
     }
 
     public List<String> getStop() {
@@ -126,6 +136,15 @@ public class OpenAiChatCompletionRequestBody {
     public void setLogitBias(Map<Integer, Double> logitBias) {
         this.logitBias = logitBias;
     }
+
+    public String getPrompt() {
+        return prompt;
+    }
+
+    public void setPrompt(String prompt) {
+        this.prompt = prompt;
+    }
+
     
-    
+
 }

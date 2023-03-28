@@ -19,7 +19,7 @@ public class OpenAiAutoConfiguration {
     @ConditionalOnProperty(prefix="openai", name = "organization", havingValue = "ConditionalOnMissingProperty", matchIfMissing = true)
     public OpenAiSource configureOpenAiApiAccessor(){
         String httpHeaderAuthorization = "Bearer " + properties.getKey();
-        return new OpenAiSource(httpHeaderAuthorization, this.properties.getChatCompletion());
+        return new OpenAiSource(httpHeaderAuthorization, this.properties);
     }
 
     @Bean
@@ -27,6 +27,6 @@ public class OpenAiAutoConfiguration {
     public OpenAiSource configureOpenAiApiAccessorWithOrganization(){
         String httpHeaderAuthorization = "Bearer " + properties.getKey();
         String httpHeaderOpenAiOrganization = properties.getOrganization();
-        return new OpenAiSource(httpHeaderAuthorization, httpHeaderOpenAiOrganization);
+        return new OpenAiSource(httpHeaderAuthorization, httpHeaderOpenAiOrganization, this.properties);
     }
 }
