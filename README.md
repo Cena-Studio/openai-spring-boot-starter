@@ -53,7 +53,7 @@ public void MyMethod(){
     chatCompletion.addUserMessage("Which is the largest lake in scotland");
     
     // request for a chat completion with the prompt
-    OpenAiChatCompletionResponse response = chatCompletion.create();
+    OpenAiChatCompletionResponseBody response = chatCompletion.create();
 
     // GPT responds you with message "The largest lake in Scotland is actually Loch Lomond."
 
@@ -82,7 +82,7 @@ chatCompletion.addUserMessage("Which is the largest lake in scotland")
     .addUserMessage("What about the highest mountain?");
 
 // request for a chat completion with the prompt
-OpenAiChatCompletionResponse response = chatCompletion.create();
+OpenAiChatCompletionResponseBody response = chatCompletion.create();
 
 // GPT responds you with message "The highest mountain in Scotland is Ben Nevis."
 ```
@@ -94,7 +94,7 @@ This time let's make the same two requests about lakes and mountains again, but 
 ```java
 OpenAiChatCompletionContext chatCompletion = openAiSource.createChatCompletionContext();
 
-OpenAiChatCompletionResponse response = chatCompletion.create("Which is the largest lake in scotland");
+OpenAiChatCompletionResponseBody response = chatCompletion.create("Which is the largest lake in scotland");
 System.out.println(response.getMessage());  // "The largest lake in Scotland is actually Loch Lomond."
 
 response = chatCompletion.create("What about the highest mountain?");
@@ -116,7 +116,7 @@ public class MyService{
         OpenAiChatCompletionContext chatCompletion = contextMap.get(conversationId);
         // user send "Which is the largest lake in scotland" and triggered request_1
         // user send "What about the highest mountain?" and triggered request_2
-        OpenAiChatCompletionResponse response = chatCompletion.create(userMessage);
+        OpenAiChatCompletionResponseBody response = chatCompletion.create(userMessage);
 
         System.out.println(response.getMessage());  // "The largest lake in Scotland is Loch Lomond and the highest mountain in Scotland is Ben Nevis."
 
@@ -173,3 +173,96 @@ public class MyService{
 }
 ```
 ### 3.4 Choices
+All the examples discussed so far are based on the default choices, i.e. n = 1. So, can this starter handle multiple choices? The answer is absolutely yes.
+Let's make a request first:
+```java
+// create a context, set the request parameter n = 3 and make a request
+OpenAiChatCompletionContext chatCompletion = openAiSource.createChatCompletionContext();
+OpenAiChatCompletionResponseBody response = chatCompletion.setN(3).create("Is there a monster in Loch Ness?");
+```
+Now the response conains three choices:
+```java
+String messageContentOne = response.getChoices().get(0).getMessage().getContent();
+String messageContentTwo = response.getChoices().get(1).getMessage().getContent();
+String messageContentThree = response.getChoices().get(2).getMessage().getContent();
+
+System.out.println(messageContentOne);  // "I don’t have personal beliefs..."
+System.out.println(messageContentTwo);  // "I cannot prove or disprove..."
+System.out.println(messageContentThree);    // "I cannot assert the existence..."
+```
+Or, fetch them by using the shorcut:
+```java
+String messageContentOne = response.getMessage();   // same as response.getMessage(0)
+String messageContentTwo = response.getMessage(1);
+String messageContentThree = response.getMessage(2);
+```
+Now there are three branches in the context. To continue with one of the branches:
+```java
+// switch the context to the second choice (index start from 0) and continue the conversation based on it
+response = chatCompletion.setN(2).switchVersion(1).create("Got it. Thank you, GPT.");
+
+//now you get two choices responding to the above request
+
+// keep requesting without switch version
+response = chatCompletion.create("Tell me a joke");
+```
+As demonstrated above, managing multiple choices is super concise with the strong support of this starter. But there could be two questions remained:
+1. What if I don't switch version after getting a multiple choices response?
+2. Supposing we've made several multiple-choices requests, each time we switch a choice and make the next request so the conversation goes further and further. What if we want to roll back to the 3-choices response for the very first request and choose another branch of it and extend another conversation?
+
+For Question 1, if the context is not switched manually, it will by default adopts the first choice. Therefore, the last statement in the above code example equals to the following statement:
+```java
+response = chatCompletion.switchVersion(0).create("Tell me a joke");
+```
+For Question 2, even there is such a complicated requirement, this starter still support it by using the following implementation:
+```java
+// create a context
+OpenAiChatCompletionContext chatCompletion = openAiSource.createChatCompletionContext();
+// make the 1st request for a 3-choices response
+OpenAiChatCompletionResponseBody response = chatCompletion.setN(3).create("Is there a monster in Loch Ness?");
+
+// get the needed information from the response
+
+// switch the context to the third choice and record that version
+Version savedVersion = chatCompletion.switchVersion(2).getVersion();
+// switch back to the second choice and make the 2nd request for a 2-choices response
+response = chatCompletion.setN(2).switchVersion(1).create("Got it. Thank you, GPT.");
+
+// get the needed information from the response
+
+// the conversation goes further with the 3rd request
+response = chatCompletion.create("Tell me a joke");
+
+// get the needed information from the response
+
+// roll back to the very early version
+chatCompletionOne.switchVersion(savedVersion);
+```
+In one word, the only thing needed to be done for switching to an early version is to use the getVersion() method to take a snapshot of it.
+
+Now we are almost at the end of the Chat Completion. But before that, there is a final important note about `switchVersion()`. Please see the final example below:
+```java
+// supposing the n value is set to 3 in the configuration file
+// make the 1st request for a 3-choices response
+OpenAiChatCompletionResponseBody response = chatCompletion.create("Is there a monster in Loch Ness?");
+
+// save a early version
+Version earlyVersion = chatCompletion.getVersion();
+
+
+// make several requests
+response = chatCompletion.create("Got it. Thank you, GPT.");
+response = chatCompletion.create("Tell me a joke");
+...
+...
+
+// save the latest version
+Version latestVersion = chatCompletion.getVersion();
+
+// there is no problem to roll back to the early version
+chatCompletionOne.switchVersion(earlyVersion);
+
+// ERROR because the latestVersion no longer exists
+chatCompletionOne.switchVersion(latestVersion);
+```
+ATTENTION: When rolling back to an early version, the child branches will be discarded to keep the context safe. Developers should be careful when switch to a version that is not the latest version of a branch.
