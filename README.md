@@ -5,17 +5,7 @@ This project is an **unofficial** Spring Boot starter for quick access to Open A
 This project is currently established on Spring Boot 3.0.4. Broader version support will be provided based on feedback and demands from the community in the future. In the meantime, please make sure that your Spring Boot project version is compatible with this starter.
 
 ## 2 Development Roadmap
-- Chat Completion ![completed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/completed.png)
-    - auto configuration ![completed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/completed.png)
-    - basic functionality ![completed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/completed.png)
-    - stream ![postponed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/postponed.png)
-    - choices ![completed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/completed.png)
-    - ohter properties ![completed](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/completed.png)
-- Text Completion  ![current stage](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/label/current_stage.png)
-- Moderation
-- Image Generation
-- HTTP Connection Configuration
-- Other APIs
+![roadmap](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/roadmap.png)
 
 # Quick Start
 ## 1 Basic Preparation
