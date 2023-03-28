@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class OpenAiTextCompletionResponseBody {
 
-    private String id, object, model;
+    private String id, object, model, suffix;
     private Long created;
     private List<OpenAiTextCompletionResponseChoice> choices;
     private OpenAiTextCompletionResponseUsage usage;
@@ -60,11 +60,19 @@ public class OpenAiTextCompletionResponseBody {
         this.choices = choices;
     }
 
-    public int getPromptToken(){
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+
+    public int getPromptTokens(){
         return this.usage.getPromptTokens();
     }
 
-    public int getCompletionToken(){
+    public int getCompletionTokens(){
         return this.usage.getCompletionTokens();
     }
 
@@ -79,7 +87,7 @@ public class OpenAiTextCompletionResponseBody {
     public static class OpenAiTextCompletionResponseChoice {
     
         private int index;
-        private String text, prompt;
+        private String text, suffix;
         private Integer logprobs;
         @JsonProperty("finish_reason")
         private String finishReason;
@@ -107,11 +115,11 @@ public class OpenAiTextCompletionResponseBody {
         public void setFinishReason(String finishReason) {
             this.finishReason = finishReason;
         }
-        public String getPrompt() {
-            return prompt;
+        public String getSuffix() {
+            return suffix;
         }
-        public void setPrompt(String prompt) {
-            this.prompt = prompt;
+        public void setSuffix(String suffix) {
+            this.suffix = suffix;
         }
         
         

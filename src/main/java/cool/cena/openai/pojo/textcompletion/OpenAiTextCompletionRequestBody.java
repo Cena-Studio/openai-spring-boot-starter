@@ -17,12 +17,15 @@ public class OpenAiTextCompletionRequestBody {
     @JsonProperty("top_p")
     private Double topP;
     private Integer n;
+    private Integer logprobs;
     private boolean echo;
     private List<String> stop;
     @JsonProperty("presence_penalty")
     private Double presencePenalty;
     @JsonProperty("frequency_penalty")
     private Double frequencyPenalty;
+    @JsonProperty("best_of")
+    private Integer bestOf;
     @JsonProperty("logit_bias")
     Map<Integer, Double> logitBias;
 
@@ -34,10 +37,12 @@ public class OpenAiTextCompletionRequestBody {
         this.temperature = textCompletionProperties.getTemperature();
         this.topP = textCompletionProperties.getTopP();
         this.n = textCompletionProperties.getN();
+        this.logprobs = textCompletionProperties.getLogprobs();
         this.echo = textCompletionProperties.isEcho();
         this.stop = textCompletionProperties.getStop();
         this.presencePenalty = textCompletionProperties.getPresencePenalty();
         this.frequencyPenalty = textCompletionProperties.getFrequencyPenalty();
+        this.bestOf = textCompletionProperties.getBestOf();
         this.logitBias = textCompletionProperties.getLogitBias();
     }
 
@@ -75,6 +80,22 @@ public class OpenAiTextCompletionRequestBody {
 
     public Double getTemperature() {
         return temperature;
+    }
+
+    public Integer getLogprobs() {
+        return logprobs;
+    }
+
+    public void setLogprobs(Integer logprobs) {
+        this.logprobs = logprobs;
+    }
+
+    public Integer getBestOf() {
+        return bestOf;
+    }
+
+    public void setBestOf(Integer bestOf) {
+        this.bestOf = bestOf;
     }
 
     public void setTemperature(Double temperature) {
@@ -144,7 +165,5 @@ public class OpenAiTextCompletionRequestBody {
     public void setPrompt(String prompt) {
         this.prompt = prompt;
     }
-
-    
 
 }

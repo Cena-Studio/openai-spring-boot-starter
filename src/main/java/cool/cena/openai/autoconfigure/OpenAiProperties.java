@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -61,9 +63,12 @@ public class OpenAiProperties {
         private Double temperature;
         private Double topP;
     
-        private Integer n, maxTokens, logprobs;
+        private Integer n, maxTokens;
         private boolean stream, echo;
 
+        @Min(0)
+        @Max(5)
+        private Integer logprobs;
         private List<String> stop;
 
         @DecimalMin("-2.0")
@@ -72,7 +77,9 @@ public class OpenAiProperties {
         @DecimalMin("-2.0")
         @DecimalMax("2.0")
         private Double frequencyPenalty;
-
+        
+        @Min(0)
+        @Max(20)
         private Integer bestOf;
         private Map<Integer, Double> logitBias;
         private String user;
