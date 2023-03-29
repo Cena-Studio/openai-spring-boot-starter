@@ -379,3 +379,83 @@ Double sexual = response.getScoreResults("sexual");
 // retrieve the judgement of violence possibility using a short cut
 boolean violence = response.getBooleanResults("violence");
 ```
+## 5 Image Generation
+This API can synthesize pictures based on your a given prompt.
+### 5.1 Usage
+To use this API with this starter:
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+
+    public void MyMethod(){
+        
+        // create a context for image generation
+        OpenAiImageGenerationContext imageGeneration = openAiSource.createImageGenerationContext();
+
+        // make a request with the prompt "A highland cattle drinking whisky"
+        OpenAiImageGenerationResponseBody response = imageGeneration.create("A highland cattle drinking whisky");
+
+        // get and print the image url
+        System.out.println(response.getData().get(0).get("url"));
+
+    }
+
+}
+```
+OpenAi supports two formats of images in the response body. By default it gives a image url (like the above example). If the request parameter is set to `format: b64_json`, please use the statement below to get the responded image. The details of the request parameters will soon be discussed in Section 5.2.
+```java
+// get and print the base64 string of the image
+System.out.println(response.getData().get(0).get("b64_json"));
+```
+However, it looks tedious to completely follow the structure of the response body to get a image. So, this starter provides shortcuts for it:
+```java
+// get the image with shortcut no matter the format
+String image = response.getImage();
+```
+Note that it is not necessary to specify the format by using this shortcut. It will return a string of either image url or base64 depending on the request.
+
+In addition, OpenAi also supports generating multiple images as choices for one single request, which is also supported by the shorcut:
+```java
+// get the second choice of a base64 image based on OpenAPI response structure
+image = response.getData().get(1).get("b64_json");
+
+// get the second choice of the images with shortcut no matter the format
+image = response.getImage(1);
+```
+### 5.2 Request Parameters
+A general configuration for image generation context could be written in the configuration file before the application launched:
+```yaml
+openai:
+    key: xx-xxxxxxxx
+    imageGeneration:
+        n: 1    # number of candidate images generated for a request
+        size: "1024x1024"  # the size of the image.
+        response_format: "url"  # the format of the image in the response.
+        user: "cena"  # the user of the completion request
+```
+The configuration of each single context instance can be dynamically customed. An example is given below:
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+
+    public void MyMethod(){
+        
+        OpenAiImageGenerationContext imageGenerationOne = openAiSource.createImageGenerationContext();
+        OpenAiImageGenerationContext imageGenerationTwo = openAiSource.createImageGenerationContext();
+
+        // imageGenerationOne and ...Two have same configurations when making requests
+
+        imageGenerationOne.setN("2");
+        imageGenerationTwo.setSize("256x256");
+        
+        // now imageGenerationOne and ...Two have different configurations
+
+    }
+
+}

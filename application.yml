@@ -36,3 +36,8 @@ openai:
         user: "cena"  # the user of the completion request
     moderation:
         model: "text-moderation-latest" # the model used for the moderation
+    imageGeneration:
+        n: 1    # number of candidate images generated for a request
+        size: "1024x1024"  # the size of the image.
+        response_format: "url"  # the format of the image in the response.
+        user: "cena"  # the user of the completion request
