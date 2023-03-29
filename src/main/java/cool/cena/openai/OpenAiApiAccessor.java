@@ -14,6 +14,8 @@ import cool.cena.openai.exception.OpenAiChatCompletionUnauthorizedException;
 import cool.cena.openai.exception.OpenAiChatCompletionUnknownException;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody;
+import cool.cena.openai.pojo.image.OpenAiImageEditRequestBody;
+import cool.cena.openai.pojo.image.OpenAiImageEditResponseBody;
 import cool.cena.openai.pojo.image.OpenAiImageGenerationRequestBody;
 import cool.cena.openai.pojo.image.OpenAiImageGenerationResponseBody;
 import cool.cena.openai.pojo.moderation.OpenAiModerationRequestBody;
@@ -27,6 +29,7 @@ public class OpenAiApiAccessor {
     private final String CHAT_COMPLETION_URL = "https://api.openai.com/v1/chat/completions";
     private final String MODERATION_URL = "https://api.openai.com/v1/moderations";
     private final String IMAGE_GENERATION_URL = "https://api.openai.com/v1/images/generations";
+    private final String IMAGE_EDIT_URL = "https://api.openai.com/v1/images/edits";
 
 
     private RestTemplate restTemplate;
@@ -151,6 +154,42 @@ public class OpenAiApiAccessor {
         try{
 
             OpenAiImageGenerationResponseBody responseBody = this.restTemplate.postForObject(this.IMAGE_GENERATION_URL, requestEntity, OpenAiImageGenerationResponseBody.class);
+            return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+
+            if(httpStatusCode == HttpStatus.BAD_REQUEST){
+                System.out.println(e.getMessage());
+
+                throw new OpenAiChatCompletionBadRequestException();
+
+            }else if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiChatCompletionUnauthorizedException();
+
+            }else{
+
+                throw new OpenAiChatCompletionStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(RestClientException e){
+
+            throw new OpenAiChatCompletionUnknownException(e.getMessage());
+
+        }
+    }
+
+    // image generation request
+    public OpenAiImageEditResponseBody sendRequest(OpenAiImageEditRequestBody requestBody){
+
+        HttpEntity<OpenAiImageEditRequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+        
+        try{
+
+            OpenAiImageEditResponseBody responseBody = this.restTemplate.postForObject(this.IMAGE_GENERATION_URL, requestEntity, OpenAiImageEditResponseBody.class);
             return responseBody;
         
         }catch(HttpStatusCodeException e){

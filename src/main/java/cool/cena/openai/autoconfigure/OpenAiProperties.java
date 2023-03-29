@@ -20,6 +20,8 @@ public class OpenAiProperties {
     private OpenAiChatCompletionProperties chatCompletion = new OpenAiChatCompletionProperties();
     private OpenAiModerationProperties moderation = new OpenAiModerationProperties();
     private OpenAiImageGenerationProperties imageGeneration = new OpenAiImageGenerationProperties();
+    private OpenAiImageEditProperties imageEdit = new OpenAiImageEditProperties();
+    private OpenAiImageVariationProperties imageVariation = new OpenAiImageVariationProperties();
 
 
     public String getKey() {
@@ -54,6 +56,14 @@ public class OpenAiProperties {
         this.chatCompletion = chatCompletion;
     }
 
+    public OpenAiModerationProperties getModeration() {
+        return moderation;
+    }
+
+    public void setModeration(OpenAiModerationProperties moderation) {
+        this.moderation = moderation;
+    }
+
     public OpenAiImageGenerationProperties getImageGeneration() {
         return imageGeneration;
     }
@@ -62,12 +72,20 @@ public class OpenAiProperties {
         this.imageGeneration = imageGeneration;
     }
 
-    public OpenAiModerationProperties getModeration() {
-        return moderation;
+    public OpenAiImageEditProperties getImageEdit() {
+        return imageEdit;
     }
 
-    public void setModeration(OpenAiModerationProperties moderation) {
-        this.moderation = moderation;
+    public void setImageEdit(OpenAiImageEditProperties imageEdit) {
+        this.imageEdit = imageEdit;
+    }
+
+    public OpenAiImageVariationProperties getImageVariation() {
+        return imageVariation;
+    }
+
+    public void setImageVariation(OpenAiImageVariationProperties imageVariation) {
+        this.imageVariation = imageVariation;
     }
 
 
@@ -312,8 +330,8 @@ public class OpenAiProperties {
     
     
     }
-    
-    public static class OpenAiImageGenerationProperties{
+
+    public static class OpenAiImageProperties{
         
         @Min(1)
         @Max(10)
@@ -352,12 +370,14 @@ public class OpenAiProperties {
         public void setUser(String user) {
             this.user = user;
         }
-
-        
-    
     
     }
 
+    public static class OpenAiImageGenerationProperties extends OpenAiImageProperties{}
+    
+    public static class OpenAiImageEditProperties extends OpenAiImageProperties{}
+    
+    public static class OpenAiImageVariationProperties extends OpenAiImageProperties{}
 
 
     

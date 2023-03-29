@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 
 import cool.cena.openai.autoconfigure.OpenAiProperties;
 import cool.cena.openai.context.OpenAiChatCompletionContext;
+import cool.cena.openai.context.OpenAiImageEditContext;
 import cool.cena.openai.context.OpenAiImageGenerationContext;
 import cool.cena.openai.context.OpenAiModerationContext;
 import cool.cena.openai.context.OpenAiTextCompletionContext;
@@ -52,4 +53,12 @@ public class OpenAiSource {
     public OpenAiImageGenerationContext createImageGenerationContext(){
         return new OpenAiImageGenerationContext(this.openAiApiAccessor, openAiProperties.getImageGeneration());
     }
+
+    public OpenAiImageEditContext createImageEditContext(){
+        return new OpenAiImageEditContext(this.openAiApiAccessor, openAiProperties.getImageEdit());
+    }
+
+    /* public OpenAiImageVariationContext createImageVariationContext(){
+        return new OpenAiImageVariationContext(this.openAiApiAccessor, openAiProperties.getImageVariation());
+    } */
 }
