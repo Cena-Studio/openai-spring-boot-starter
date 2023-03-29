@@ -21,5 +21,11 @@ public class OpenAiImageGenerationResponseBody {
     public void setData(List<Map<String, String>> data) {
         this.data = data;
     }
+    public String getImage(){
+        return this.getImage(0);
+    }
+    public String getImage(int choice){
+        return this.data.get(choice).entrySet().iterator().next().getValue();
+    }
     
 }

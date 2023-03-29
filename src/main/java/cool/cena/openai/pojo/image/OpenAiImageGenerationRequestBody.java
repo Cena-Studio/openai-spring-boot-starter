@@ -1,12 +1,18 @@
 package cool.cena.openai.pojo.image;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiImageGenerationProperties;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OpenAiImageGenerationRequestBody {
         
     private Integer n;
 
-    private String prompt, size, responseFormat, user;
+    @JsonProperty("response_format")
+    private String responseFormat;
+    private String prompt, size, user;
 
     public OpenAiImageGenerationRequestBody(OpenAiImageGenerationProperties imageGenerationProperties) {
         this.n = imageGenerationProperties.getN();

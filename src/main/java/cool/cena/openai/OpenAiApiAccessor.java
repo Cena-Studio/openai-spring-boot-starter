@@ -158,6 +158,7 @@ public class OpenAiApiAccessor {
             HttpStatusCode httpStatusCode = e.getStatusCode();
 
             if(httpStatusCode == HttpStatus.BAD_REQUEST){
+                System.out.println(e.getMessage());
 
                 throw new OpenAiChatCompletionBadRequestException();
 
