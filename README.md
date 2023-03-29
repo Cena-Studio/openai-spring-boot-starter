@@ -41,7 +41,7 @@ public class MyService{
 ```
 ## 2 Text Completion
 Text completion is the a basic form of completion. A response will be generated to answer a prompt.
-### 2.1 Basic Usage
+### 2.1 Usage
 The following are the basic statements to request for a text completion in a service class:
 ```java
 @Service
@@ -56,7 +56,7 @@ public class MyService{
         OpenAiTextCompletionContext textCompletion = openAiSource.createTextCompletionContext();
 
         // make a request with the prompt "Which is the most famous tourist attraction in Glasgow"
-        OpenAiTextCompletionResponseBody response = textCompletion.create();
+        OpenAiTextCompletionResponseBody response = textCompletion.create("Which is the most famous tourist attraction in Glasgow");
 
         // retrieve the completion text "It is probably the Kelvingrove Art Gallery and Museum"
         String responseText = response.getChoices().get(0).getText();
@@ -68,11 +68,11 @@ public class MyService{
 ```
 The above `OpenAiTextCompletionResponseBody` instance is strictly encapsulated according to the OpenAPI spec, and the property names follow Java camel case conventions. You can use getters to retrieve any properties you need from the response. Since the completion text might be the most frequently fetched information, the response object offers a shortcut method for it:
 ```java
-    // retrieve the completion text using a short cut
-    String responseText = response.getText();
+// retrieve the completion text using a short cut
+String responseText = response.getText();
 
-    //// retrieve the second completion text if you request for multiple choices
-    String responseText = response.getText(1);
+//// retrieve the second completion text if you request for multiple choices
+String responseText = response.getText(1);
 ```
 ### 2.2 Request Parameters
 A complete general configuration for initializing every text completion can be written in the configuration file as shown below:
@@ -337,3 +337,45 @@ chatCompletionOne.switchVersion(earlyVersion);
 chatCompletionOne.switchVersion(latestVersion);
 ```
 **ATTENTION** When rolling back to an early version, the child branches will be discarded to keep the context safe. Developers should be careful when switch to a version that is not the latest version of a branch.
+## 4 Moderation
+Moderation is a small but important API to classify if the input texts are violative.
+### 4.1 Usage
+The following are the example implementation for making a request:
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+
+    public void MyMethod(){
+        
+        // create a context for moderation
+        OpenAiModerationContext moderation = openAiSource.createModerationContext();
+
+        // make a request with the input "I want to beat my neighbours" (the author has very kind neighbours so this is just an example)
+        OpenAiModerationResponseBody response = moderation.create("I want to beat my neighbours");
+
+        boolean flag = response.getResults().get(0).isFlagged();
+        double sexual = response.getResults().get(0).getCategoryScores().get("sexual"); // instead of getSexual() here
+        boolean violence = response.getResults().get(0).getCategories().get("violence");
+
+        System.out.println(flag);   // output true
+        System.out.println(sexual); // output 8.516480011167005E-5
+        System.out.println(violence);   // output true
+
+    }
+
+}
+```
+The above `OpenAiModerationResponseBody` instance is strictly encapsulated according to the OpenAPI spec, and the property names follow Java camel case conventions. A small difference is that the contents of categories and categoryScores are encapsulated into maps for intuitiveness and traversal. Shortcuts are as well offered for those main data:
+```java
+// retrieve the flag using a short cut
+boolean flag = response.isFlagged();
+
+// retrieve the score of sexual possibility using a short cut
+Double sexual = response.getScoreResults("sexual");
+
+// retrieve the judgement of violence possibility using a short cut
+boolean violence = response.getBooleanResults("violence");
+```

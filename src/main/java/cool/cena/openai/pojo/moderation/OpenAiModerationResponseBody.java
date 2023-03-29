@@ -35,12 +35,24 @@ public class OpenAiModerationResponseBody {
         this.results = results;
     }
 
+    public boolean getBooleanResults(String classification){
+        return this.getResults().get(0).getCategories().get(classification);
+    }
+
+    public Double getScoreResults(String classification){
+        return this.getResults().get(0).getCategoryScores().get(classification);
+    }
+
+    public boolean isFlagged(){
+        return this.getResults().get(0).isFlagged();
+    }
  
     public static class OpenAiModerationResponseResult {
     
         private Map<String, Boolean> categories;
         @JsonProperty("category_scores")
         private Map<String, Double> categoryScores;
+        private boolean flagged;
         
         public Map<String, Boolean> getCategories() {
             return categories;
@@ -53,6 +65,12 @@ public class OpenAiModerationResponseBody {
         }
         public void setCategoryScores(Map<String, Double> categoryScores) {
             this.categoryScores = categoryScores;
+        }
+        public boolean isFlagged() {
+            return flagged;
+        }
+        public void setFlagged(boolean flagged) {
+            this.flagged = flagged;
         }
 
         

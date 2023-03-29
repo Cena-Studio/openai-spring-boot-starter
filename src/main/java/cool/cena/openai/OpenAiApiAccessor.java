@@ -23,6 +23,7 @@ public class OpenAiApiAccessor {
 
     private final String TEXT_COMPLETION_URL = "https://api.openai.com/v1/completions";
     private final String CHAT_COMPLETION_URL = "https://api.openai.com/v1/chat/completions";
+    private final String MODERATION_URL = "https://api.openai.com/v1/moderations";
 
     private RestTemplate restTemplate;
     private HttpHeaders httpHeaders;
@@ -110,7 +111,7 @@ public class OpenAiApiAccessor {
         
         try{
 
-            OpenAiModerationResponseBody responseBody = this.restTemplate.postForObject(this.CHAT_COMPLETION_URL, requestEntity, OpenAiModerationResponseBody.class);
+            OpenAiModerationResponseBody responseBody = this.restTemplate.postForObject(this.MODERATION_URL, requestEntity, OpenAiModerationResponseBody.class);
             return responseBody;
         
         }catch(HttpStatusCodeException e){

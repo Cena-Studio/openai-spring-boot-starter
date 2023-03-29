@@ -290,7 +290,7 @@ public class OpenAiProperties {
 
     public static class OpenAiModerationProperties{
 
-        private String model = "text-moderation-latest";
+        private String model;
 
         public String getModel() {
             return model;
