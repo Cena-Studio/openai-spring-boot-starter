@@ -339,7 +339,7 @@ chatCompletionOne.switchVersion(latestVersion);
 **ATTENTION** When rolling back to an early version, the child branches will be discarded to keep the context safe. Developers should be careful when switch to a version that is not the latest version of a branch.
 ## 4 Moderation
 Moderation is a small but important API to classify if the input texts are violative.
-### 4.1 Usage
+
 The following are the example implementation for making a request:
 ```java
 @Service

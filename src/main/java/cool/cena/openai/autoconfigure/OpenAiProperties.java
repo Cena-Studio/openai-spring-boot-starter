@@ -19,6 +19,8 @@ public class OpenAiProperties {
     private OpenAiTextCompletionProperties textCompletion = new OpenAiTextCompletionProperties();
     private OpenAiChatCompletionProperties chatCompletion = new OpenAiChatCompletionProperties();
     private OpenAiModerationProperties moderation = new OpenAiModerationProperties();
+    private OpenAiImageGenerationProperties imageGeneration = new OpenAiImageGenerationProperties();
+
 
     public String getKey() {
         return key;
@@ -50,6 +52,14 @@ public class OpenAiProperties {
     
     public void setChatCompletion(OpenAiChatCompletionProperties chatCompletion) {
         this.chatCompletion = chatCompletion;
+    }
+
+    public OpenAiImageGenerationProperties getImageGeneration() {
+        return imageGeneration;
+    }
+
+    public void setImageGeneration(OpenAiImageGenerationProperties imageGeneration) {
+        this.imageGeneration = imageGeneration;
     }
 
     public OpenAiModerationProperties getModeration() {
@@ -303,7 +313,50 @@ public class OpenAiProperties {
     
     }
     
+    public static class OpenAiImageGenerationProperties{
+        
+        @Min(1)
+        @Max(10)
+        private Integer n;
 
+        private String size, responseFormat, user;
+
+        public Integer getN() {
+            return n;
+        }
+
+        public void setN(Integer n) {
+            this.n = n;
+        }
+
+        public String getSize() {
+            return size;
+        }
+
+        public void setSize(String size) {
+            this.size = size;
+        }
+
+        public String getResponseFormat() {
+            return responseFormat;
+        }
+
+        public void setResponseFormat(String responseFormat) {
+            this.responseFormat = responseFormat;
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        
+    
+    
+    }
 
 
 
