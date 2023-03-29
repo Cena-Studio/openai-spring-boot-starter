@@ -18,6 +18,7 @@ public class OpenAiProperties {
     private String key, organization;
     private OpenAiTextCompletionProperties textCompletion = new OpenAiTextCompletionProperties();
     private OpenAiChatCompletionProperties chatCompletion = new OpenAiChatCompletionProperties();
+    private OpenAiModerationProperties moderation = new OpenAiModerationProperties();
 
     public String getKey() {
         return key;
@@ -51,6 +52,13 @@ public class OpenAiProperties {
         this.chatCompletion = chatCompletion;
     }
 
+    public OpenAiModerationProperties getModeration() {
+        return moderation;
+    }
+
+    public void setModeration(OpenAiModerationProperties moderation) {
+        this.moderation = moderation;
+    }
 
 
     public static class OpenAiTextCompletionProperties{
@@ -77,7 +85,7 @@ public class OpenAiProperties {
         @DecimalMin("-2.0")
         @DecimalMax("2.0")
         private Double frequencyPenalty;
-        
+
         @Min(0)
         @Max(20)
         private Integer bestOf;
@@ -280,8 +288,20 @@ public class OpenAiProperties {
         }
     }
 
+    public static class OpenAiModerationProperties{
 
+        private String model = "text-moderation-latest";
 
+        public String getModel() {
+            return model;
+        }
+
+        public void setModel(String model) {
+            this.model = model;
+        }
+    
+    
+    }
     
 
 

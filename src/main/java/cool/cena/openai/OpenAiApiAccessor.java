@@ -14,6 +14,8 @@ import cool.cena.openai.exception.OpenAiChatCompletionUnauthorizedException;
 import cool.cena.openai.exception.OpenAiChatCompletionUnknownException;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody;
+import cool.cena.openai.pojo.moderation.OpenAiModerationRequestBody;
+import cool.cena.openai.pojo.moderation.OpenAiModerationResponseBody;
 import cool.cena.openai.pojo.textcompletion.OpenAiTextCompletionRequestBody;
 import cool.cena.openai.pojo.textcompletion.OpenAiTextCompletionResponseBody;
 
@@ -74,6 +76,41 @@ public class OpenAiApiAccessor {
         try{
 
             OpenAiChatCompletionResponseBody responseBody = this.restTemplate.postForObject(this.CHAT_COMPLETION_URL, requestEntity, OpenAiChatCompletionResponseBody.class);
+            return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+
+            if(httpStatusCode == HttpStatus.BAD_REQUEST){
+
+                throw new OpenAiChatCompletionBadRequestException();
+
+            }else if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiChatCompletionUnauthorizedException();
+
+            }else{
+
+                throw new OpenAiChatCompletionStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(RestClientException e){
+
+            throw new OpenAiChatCompletionUnknownException(e.getMessage());
+
+        }
+    }
+
+    // moderation request
+    public OpenAiModerationResponseBody sendRequest(OpenAiModerationRequestBody requestBody){
+
+        HttpEntity<OpenAiModerationRequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+        
+        try{
+
+            OpenAiModerationResponseBody responseBody = this.restTemplate.postForObject(this.CHAT_COMPLETION_URL, requestEntity, OpenAiModerationResponseBody.class);
             return responseBody;
         
         }catch(HttpStatusCodeException e){
