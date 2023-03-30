@@ -337,8 +337,9 @@ chatCompletionOne.switchVersion(earlyVersion);
 chatCompletionOne.switchVersion(latestVersion);
 ```
 **ATTENTION** When rolling back to an early version, the child branches will be discarded to keep the context safe. Developers should be careful when switch to a version that is not the latest version of a branch.
-## 4 Moderation
-Moderation is a small but important API to classify if the input texts are violative.
+## 4 Edit
+## 5 Moderation
+Moderation might be an important API to classify if the input texts are violative.
 
 The following are the example implementation for making a request:
 ```java
@@ -379,9 +380,9 @@ Double sexual = response.getScoreResults("sexual");
 // retrieve the judgement of violence possibility using a short cut
 boolean violence = response.getBooleanResults("violence");
 ```
-## 5 Image Generation
+## 6 Image Generation
 This API can synthesize pictures based on a given prompt.
-### 5.1 Usage
+### 6.1 Usage
 To use this API with this starter:
 ```java
 @Service
@@ -425,7 +426,7 @@ image = response.getData().get(1).get("b64_json");
 // get the second choice of the images with shortcut no matter the format
 image = response.getImage(1);
 ```
-### 5.2 Request Parameters
+### 6.2 Request Parameters
 A general configuration for image generation context could be written in the configuration file before the application launched:
 ```yaml
 openai:
@@ -459,9 +460,10 @@ public class MyService{
     }
 
 }
-## 6 Image Edit
+```
+## 7 Image Edit
 This API can edit an existing image based on a given prompt and a mask image.
-### 6.1 Usage
+### 7.1 Usage
 This API requires image files as request parameters. This starter aim to support different type of input parameters to represent the image file. Currently, it support `String` in base64 format, `String` of the local file path, `String` of the url of a remote image, `File`, `byte[]`, `SystemFileResource`, and `ByteArrayResource`. When an valid `String` argument is passed into the `create()` method, it will be automatically recognized and processed by this starter for making the request. Please see the example below:
 ```java
 @Service
@@ -501,7 +503,7 @@ response.getImage();
 response.getImage(1);
 ```
 **ATTENTION** Due to limitations of the OpenAI API, the original image used for a request must be a png file with a square size, i.e. height = width. Besides, it must be in one of RGBA (rgb with alpha channel), LA (grayscale with alpha channel), L (grayscale) formats. This starter aims to provide a broader support in a future update.
-### 6.2 Request Parameters
+### 7.2 Request Parameters
 The available configuration parameters for the image edit context is the almost same as the image generation context in Section 5.2. The only difference is the `imageEdit` is written to specify the configurations inside belongs to the image edit context.
 ```yaml
 openai:
@@ -509,9 +511,9 @@ openai:
     imageEdit:
         ... # parameters
 ```
-## 7 Image Variation
+## 8 Image Variation
 This API can create different variations of an existing image.
-### 7.1 Usage
+### 8.1 Usage
 This API has a very similar request body as image edit. The difference is that there is no prompt and mask parameters. The implementation could be down as shown below: 
 ```java
 @Service
@@ -546,7 +548,7 @@ response.getImage();
 response.getImage(1);
 ```
 
-### 7.2 Request Parameters
+### 8.2 Request Parameters
 The available configuration parameters for the image edit context is the almost same as the image generation context in Section 5.2. The only difference is the `imageVariation` is written to specify the configurations inside belongs to the image edit context.
 ```yaml
 openai:
@@ -554,3 +556,4 @@ openai:
     imageVariation:
         ... # parameters
 ```
+## 9 Embedding

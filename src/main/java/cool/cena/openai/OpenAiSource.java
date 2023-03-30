@@ -3,6 +3,8 @@ package cool.cena.openai;
 import org.springframework.http.HttpHeaders;
 
 import cool.cena.openai.autoconfigure.OpenAiProperties;
+import cool.cena.openai.context.OpenAiAudioTranscriptionContext;
+import cool.cena.openai.context.OpenAiAudioTranslationContext;
 import cool.cena.openai.context.OpenAiChatCompletionContext;
 import cool.cena.openai.context.OpenAiEditContext;
 import cool.cena.openai.context.OpenAiEmbeddingContext;
@@ -68,5 +70,12 @@ public class OpenAiSource {
 
     public OpenAiEmbeddingContext createEmbeddingContext(){
         return new OpenAiEmbeddingContext(this.openAiApiAccessor, openAiProperties.getEmbedding());
+    }
+
+    public OpenAiAudioTranscriptionContext createAudioTranscriptionContext(){
+        return new OpenAiAudioTranscriptionContext(this.openAiApiAccessor, openAiProperties.getAudioTranscription());
+    }
+    public OpenAiAudioTranslationContext createAudioTranslationContext(){
+        return new OpenAiAudioTranslationContext(this.openAiApiAccessor, openAiProperties.getAudioTranslation());
     }
 }

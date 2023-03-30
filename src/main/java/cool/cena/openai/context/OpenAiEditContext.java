@@ -1,8 +1,5 @@
 package cool.cena.openai.context;
 
-import java.util.List;
-import java.util.Map;
-
 import cool.cena.openai.OpenAiApiAccessor;
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiEditProperties;
 import cool.cena.openai.pojo.edit.OpenAiEditRequestBody;

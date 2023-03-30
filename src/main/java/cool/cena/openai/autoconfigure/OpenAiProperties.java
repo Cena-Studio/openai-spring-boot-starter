@@ -24,7 +24,8 @@ public class OpenAiProperties {
     private OpenAiImageEditProperties imageEdit = new OpenAiImageEditProperties();
     private OpenAiImageVariationProperties imageVariation = new OpenAiImageVariationProperties();
     private OpenAiEmbeddingProperties embedding = new OpenAiEmbeddingProperties();
-
+    private OpenAiAudioTranscriptionProperties audioTranscription = new OpenAiAudioTranscriptionProperties();
+    private OpenAiAudioTranslationProperties audioTranslation = new OpenAiAudioTranslationProperties();
 
     public String getKey() {
         return key;
@@ -105,6 +106,23 @@ public class OpenAiProperties {
 
     public void setEmbedding(OpenAiEmbeddingProperties embedding) {
         this.embedding = embedding;
+    }
+
+
+    public OpenAiAudioTranscriptionProperties getAudioTranscription() {
+        return audioTranscription;
+    }
+
+    public void setAudioTranscription(OpenAiAudioTranscriptionProperties audioTranscription) {
+        this.audioTranscription = audioTranscription;
+    }
+
+    public OpenAiAudioTranslationProperties getAudioTranslation() {
+        return audioTranslation;
+    }
+
+    public void setAudioTranslation(OpenAiAudioTranslationProperties audioTranslation) {
+        this.audioTranslation = audioTranslation;
     }
 
 
@@ -463,12 +481,52 @@ public class OpenAiProperties {
         public void setUser(String user) {
             this.user = user;
         }
-
-        
     
     }
 
+    public static class OpenAiAudioProperties{
 
+        private String model = "whisper-1";
+        private String responseFormat;
+        @DecimalMin("0")
+        @DecimalMax("1")
+        private Double temperature;
+
+        public String getModel() {
+            return model;
+        }
+        public void setModel(String model) {
+            this.model = model;
+        }
+        public String getResponseFormat() {
+            return responseFormat;
+        }
+        public void setResponseFormat(String responseFormat) {
+            this.responseFormat = responseFormat;
+        }
+        public Double getTemperature() {
+            return temperature;
+        }
+        public void setTemperature(Double temperature) {
+            this.temperature = temperature;
+        } 
+    
+    }
+
+    public static class OpenAiAudioTranscriptionProperties extends OpenAiAudioProperties{
+
+        private String language;
+
+        public String getLanguage() {
+            return language;
+        }
+        public void setLanguage(String language) {
+            this.language = language;
+        }
+    
+    }
+
+    public static class OpenAiAudioTranslationProperties extends OpenAiAudioProperties{}
     
     
 }

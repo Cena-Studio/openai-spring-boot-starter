@@ -59,3 +59,12 @@ openai:
     Embedding:
         model: "text-embedding-ada-002" # the model for the task
         user: "cena"  # the user of the completion request
+    audioTranscription:
+        model: "whisper-1"  # the model for audio tasks. There is no alternative choices although OpenAi provided this parameter.
+        responseFormat: "json"  # the format of the generated transcription text.
+        language: "en" # language in ISO-639-1 format.
+        temperature: 0 # 0~1 decimal. degree of randomness in the output. more randomness with bigger value.
+    audioTranslation:
+        model: "whisper-1"  # the model for audio tasks. There is no alternative choices although OpenAi provided this parameter.
+        responseFormat: "json"  # the format of the generated transcription text.
+        temperature: 0 # 0~1 decimal. degree of randomness in the output. more randomness with bigger value.

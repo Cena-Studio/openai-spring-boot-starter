@@ -12,6 +12,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import cool.cena.openai.exception.OpenAiUnknownException;
+import cool.cena.openai.exception.audio.AudioResourceAccessException;
+import cool.cena.openai.exception.audio.AudioStatusCodeException;
 import cool.cena.openai.exception.OpenAiUnauthorizedException;
 import cool.cena.openai.exception.chatcompletion.ChatCompletionBadRequestException;
 import cool.cena.openai.exception.chatcompletion.ChatCompletionResourceAccessException;
@@ -27,6 +29,10 @@ import cool.cena.openai.exception.moderation.ModerationResourceAccessException;
 import cool.cena.openai.exception.moderation.ModerationStatusCodeException;
 import cool.cena.openai.exception.textcompletion.TextCompletionResourceAccessException;
 import cool.cena.openai.exception.textcompletion.TextCompletionStatusCodeException;
+import cool.cena.openai.pojo.audio.OpenAiAudioTranscriptionRequestBody;
+import cool.cena.openai.pojo.audio.OpenAiAudioTranscriptionResponseBody;
+import cool.cena.openai.pojo.audio.OpenAiAudioTranslationRequestBody;
+import cool.cena.openai.pojo.audio.OpenAiAudioTranslationResponseBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody;
 import cool.cena.openai.pojo.edit.OpenAiEditRequestBody;
@@ -54,6 +60,8 @@ public class OpenAiApiAccessor {
     private final String IMAGE_EDIT_URL = "https://api.openai.com/v1/images/edits";
     private final String IMAGE_VARIATION_URL = "https://api.openai.com/v1/images/variations";
     private final String EMBEDDING_URL = "https://api.openai.com/v1/embeddings";
+    private final String AUDIO_TRANSCRIPTION_URL = "https://api.openai.com/v1/audio/transcriptions";
+    private final String AUDIO_TRANSLATION_URL = "https://api.openai.com/v1/audio/translations";
 
 
     private RestTemplate restTemplate;
@@ -369,6 +377,80 @@ public class OpenAiApiAccessor {
         }catch(ResourceAccessException e){
 
             throw new EmbeddingResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+
+
+    // audio transcription request
+    public OpenAiAudioTranscriptionResponseBody sendRequest(OpenAiAudioTranscriptionRequestBody requestBody){
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody.toMultiValueMap(), httpJsonHeaders);
+        
+        try{
+
+            OpenAiAudioTranscriptionResponseBody responseBody = this.restTemplate.postForObject(this.AUDIO_TRANSCRIPTION_URL, requestEntity, OpenAiAudioTranscriptionResponseBody.class);
+            return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new AudioResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+
+
+    // audio translation request
+    public OpenAiAudioTranslationResponseBody sendRequest(OpenAiAudioTranslationRequestBody requestBody){
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody.toMultiValueMap(), httpJsonHeaders);
+        
+        try{
+
+            OpenAiAudioTranslationResponseBody responseBody = this.restTemplate.postForObject(this.AUDIO_TRANSLATION_URL, requestEntity, OpenAiAudioTranslationResponseBody.class);
+            return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new AudioResourceAccessException(e.getMessage());
 
         }catch(RestClientException e){
 
