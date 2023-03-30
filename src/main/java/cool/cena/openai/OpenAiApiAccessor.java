@@ -16,6 +16,8 @@ import cool.cena.openai.exception.OpenAiUnauthorizedException;
 import cool.cena.openai.exception.chatcompletion.ChatCompletionBadRequestException;
 import cool.cena.openai.exception.chatcompletion.ChatCompletionResourceAccessException;
 import cool.cena.openai.exception.chatcompletion.ChatCompletionStatusCodeException;
+import cool.cena.openai.exception.edit.EditResourceAccessException;
+import cool.cena.openai.exception.edit.EditStatusCodeException;
 import cool.cena.openai.exception.image.ImageBadRequestException;
 import cool.cena.openai.exception.image.ImageResourceAccessException;
 import cool.cena.openai.exception.image.ImageStatusCodeException;
@@ -25,6 +27,8 @@ import cool.cena.openai.exception.textcompletion.TextCompletionResourceAccessExc
 import cool.cena.openai.exception.textcompletion.TextCompletionStatusCodeException;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody;
+import cool.cena.openai.pojo.edit.OpenAiEditRequestBody;
+import cool.cena.openai.pojo.edit.OpenAiEditResponseBody;
 import cool.cena.openai.pojo.image.OpenAiImageEditRequestBody;
 import cool.cena.openai.pojo.image.OpenAiImageEditResponseBody;
 import cool.cena.openai.pojo.image.OpenAiImageGenerationRequestBody;
@@ -40,6 +44,7 @@ public class OpenAiApiAccessor {
 
     private final String TEXT_COMPLETION_URL = "https://api.openai.com/v1/completions";
     private final String CHAT_COMPLETION_URL = "https://api.openai.com/v1/chat/completions";
+    private final String EDIT_URL = "https://api.openai.com/v1/edits";
     private final String MODERATION_URL = "https://api.openai.com/v1/moderations";
     private final String IMAGE_GENERATION_URL = "https://api.openai.com/v1/images/generations";
     private final String IMAGE_EDIT_URL = "https://api.openai.com/v1/images/edits";
@@ -136,6 +141,45 @@ public class OpenAiApiAccessor {
 
         }
     }
+
+
+
+    // edit request
+    public OpenAiEditResponseBody sendRequest(OpenAiEditRequestBody requestBody){
+
+        HttpEntity<OpenAiEditRequestBody> requestEntity = new HttpEntity<>(requestBody, httpJsonHeaders);
+        
+        try{
+
+            OpenAiEditResponseBody responseBody = this.restTemplate.postForObject(this.EDIT_URL, requestEntity, OpenAiEditResponseBody.class);
+            return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new EditStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new EditResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+
 
     // moderation request
     public OpenAiModerationResponseBody sendRequest(OpenAiModerationRequestBody requestBody){

@@ -18,6 +18,7 @@ public class OpenAiProperties {
     private String key, organization;
     private OpenAiTextCompletionProperties textCompletion = new OpenAiTextCompletionProperties();
     private OpenAiChatCompletionProperties chatCompletion = new OpenAiChatCompletionProperties();
+    private OpenAiEditProperties edit = new OpenAiEditProperties();
     private OpenAiModerationProperties moderation = new OpenAiModerationProperties();
     private OpenAiImageGenerationProperties imageGeneration = new OpenAiImageGenerationProperties();
     private OpenAiImageEditProperties imageEdit = new OpenAiImageEditProperties();
@@ -54,6 +55,14 @@ public class OpenAiProperties {
     
     public void setChatCompletion(OpenAiChatCompletionProperties chatCompletion) {
         this.chatCompletion = chatCompletion;
+    }
+
+    public OpenAiEditProperties getEdit() {
+        return edit;
+    }
+
+    public void setEdit(OpenAiEditProperties edit) {
+        this.edit = edit;
     }
 
     public OpenAiModerationProperties getModeration() {
@@ -314,6 +323,51 @@ public class OpenAiProperties {
         public void setUser(String user) {
             this.user = user;
         }
+    }
+
+    public static class OpenAiEditProperties{
+        
+        private String model = "text-davinci-edit-001";
+        
+        @DecimalMin("0")
+        @DecimalMax("2")
+        private Double temperature;
+        private Double topP;
+    
+        private Integer n;
+
+        public String getModel() {
+            return model;
+        }
+
+        public void setModel(String model) {
+            this.model = model;
+        }
+
+        public Double getTemperature() {
+            return temperature;
+        }
+
+        public void setTemperature(Double temperature) {
+            this.temperature = temperature;
+        }
+
+        public Double getTopP() {
+            return topP;
+        }
+
+        public void setTopP(Double topP) {
+            this.topP = topP;
+        }
+
+        public Integer getN() {
+            return n;
+        }
+
+        public void setN(Integer n) {
+            this.n = n;
+        }
+    
     }
 
     public static class OpenAiModerationProperties{
