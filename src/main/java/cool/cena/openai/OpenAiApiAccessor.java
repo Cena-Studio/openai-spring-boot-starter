@@ -18,6 +18,8 @@ import cool.cena.openai.exception.chatcompletion.ChatCompletionResourceAccessExc
 import cool.cena.openai.exception.chatcompletion.ChatCompletionStatusCodeException;
 import cool.cena.openai.exception.edit.EditResourceAccessException;
 import cool.cena.openai.exception.edit.EditStatusCodeException;
+import cool.cena.openai.exception.embedding.EmbeddingResourceAccessException;
+import cool.cena.openai.exception.embedding.EmbeddingStatusCodeException;
 import cool.cena.openai.exception.image.ImageBadRequestException;
 import cool.cena.openai.exception.image.ImageResourceAccessException;
 import cool.cena.openai.exception.image.ImageStatusCodeException;
@@ -29,6 +31,8 @@ import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody;
 import cool.cena.openai.pojo.edit.OpenAiEditRequestBody;
 import cool.cena.openai.pojo.edit.OpenAiEditResponseBody;
+import cool.cena.openai.pojo.embedding.OpenAiEmbeddingRequestBody;
+import cool.cena.openai.pojo.embedding.OpenAiEmbeddingResponseBody;
 import cool.cena.openai.pojo.image.OpenAiImageEditRequestBody;
 import cool.cena.openai.pojo.image.OpenAiImageEditResponseBody;
 import cool.cena.openai.pojo.image.OpenAiImageGenerationRequestBody;
@@ -49,6 +53,7 @@ public class OpenAiApiAccessor {
     private final String IMAGE_GENERATION_URL = "https://api.openai.com/v1/images/generations";
     private final String IMAGE_EDIT_URL = "https://api.openai.com/v1/images/edits";
     private final String IMAGE_VARIATION_URL = "https://api.openai.com/v1/images/variations";
+    private final String EMBEDDING_URL = "https://api.openai.com/v1/embeddings";
 
 
     private RestTemplate restTemplate;
@@ -327,6 +332,43 @@ public class OpenAiApiAccessor {
         }catch(ResourceAccessException e){
 
             throw new ImageResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+
+
+    // embedding request
+    public OpenAiEmbeddingResponseBody sendRequest(OpenAiEmbeddingRequestBody requestBody){
+
+        HttpEntity<OpenAiEmbeddingRequestBody> requestEntity = new HttpEntity<>(requestBody, httpJsonHeaders);
+        
+        try{
+
+            OpenAiEmbeddingResponseBody responseBody = this.restTemplate.postForObject(this.EMBEDDING_URL, requestEntity, OpenAiEmbeddingResponseBody.class);
+            return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new EmbeddingStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new EmbeddingResourceAccessException(e.getMessage());
 
         }catch(RestClientException e){
 

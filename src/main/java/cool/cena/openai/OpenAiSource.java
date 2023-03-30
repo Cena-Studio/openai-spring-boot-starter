@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import cool.cena.openai.autoconfigure.OpenAiProperties;
 import cool.cena.openai.context.OpenAiChatCompletionContext;
 import cool.cena.openai.context.OpenAiEditContext;
+import cool.cena.openai.context.OpenAiEmbeddingContext;
 import cool.cena.openai.context.OpenAiImageEditContext;
 import cool.cena.openai.context.OpenAiImageGenerationContext;
 import cool.cena.openai.context.OpenAiImageVariationContext;
@@ -63,5 +64,9 @@ public class OpenAiSource {
 
     public OpenAiImageVariationContext createImageVariationContext(){
         return new OpenAiImageVariationContext(this.openAiApiAccessor, openAiProperties.getImageVariation());
+    }
+
+    public OpenAiEmbeddingContext createEmbeddingContext(){
+        return new OpenAiEmbeddingContext(this.openAiApiAccessor, openAiProperties.getEmbedding());
     }
 }

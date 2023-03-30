@@ -1,0 +1,38 @@
+package cool.cena.openai.pojo.embedding;
+
+import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiEmbeddingProperties;
+
+public class OpenAiEmbeddingRequestBody {
+    private String input, model, user;
+
+    public OpenAiEmbeddingRequestBody(OpenAiEmbeddingProperties embeddingProperties) {
+        this.model = embeddingProperties.getModel();
+        this.user =   embeddingProperties.getUser();
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getInput() {
+        return input;
+    }
+
+    public void setInput(String input) {
+        this.input = input;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+
+}

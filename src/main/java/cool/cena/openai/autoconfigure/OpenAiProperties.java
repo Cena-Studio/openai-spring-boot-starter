@@ -23,6 +23,7 @@ public class OpenAiProperties {
     private OpenAiImageGenerationProperties imageGeneration = new OpenAiImageGenerationProperties();
     private OpenAiImageEditProperties imageEdit = new OpenAiImageEditProperties();
     private OpenAiImageVariationProperties imageVariation = new OpenAiImageVariationProperties();
+    private OpenAiEmbeddingProperties embedding = new OpenAiEmbeddingProperties();
 
 
     public String getKey() {
@@ -95,6 +96,15 @@ public class OpenAiProperties {
 
     public void setImageVariation(OpenAiImageVariationProperties imageVariation) {
         this.imageVariation = imageVariation;
+    }
+
+
+    public OpenAiEmbeddingProperties getEmbedding() {
+        return embedding;
+    }
+
+    public void setEmbedding(OpenAiEmbeddingProperties embedding) {
+        this.embedding = embedding;
     }
 
 
@@ -432,6 +442,31 @@ public class OpenAiProperties {
     public static class OpenAiImageEditProperties extends OpenAiImageProperties{}
     
     public static class OpenAiImageVariationProperties extends OpenAiImageProperties{}
+
+    public static class OpenAiEmbeddingProperties{
+
+        private String model = "text-embedding-ada-002";
+        private String user;
+
+        public String getModel() {
+            return model;
+        }
+
+        public void setModel(String model) {
+            this.model = model;
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        
+    
+    }
 
 
     
