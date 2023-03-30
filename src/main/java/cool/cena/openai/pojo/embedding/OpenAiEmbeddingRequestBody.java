@@ -1,7 +1,10 @@
 package cool.cena.openai.pojo.embedding;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiEmbeddingProperties;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OpenAiEmbeddingRequestBody {
     private String input, model, user;
 

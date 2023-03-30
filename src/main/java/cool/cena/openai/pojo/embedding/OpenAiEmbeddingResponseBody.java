@@ -6,18 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class OpenAiEmbeddingResponseBody {
 
-    private String id, model;
+    private String object, model;
     private List<OpenAiEmbeddingResponseData> data;
     private OpenAiEmbeddingResponseUsage usage;
 
     // getters and setters
-    public String getId(){
-        return this.id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getModel(){
         return this.model;
@@ -48,10 +41,17 @@ public class OpenAiEmbeddingResponseBody {
         return this.data.get(0).getEmbedding();
     }
 
+    public String getObject() {
+        return object;
+    }
+
+    public void setObject(String object) {
+        this.object = object;
+    }
+
     public static class OpenAiEmbeddingResponseData {
     
         private String object;
-        @JsonProperty("category_scores")
         private List<Double> embedding;
         private int index;
 
@@ -117,4 +117,5 @@ public class OpenAiEmbeddingResponseBody {
             this.totalTokens = totalTokens;
         }
     }
+
 }
