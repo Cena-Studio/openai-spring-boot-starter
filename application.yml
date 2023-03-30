@@ -34,10 +34,28 @@ openai:
             1965: 1.0   # the logit bias of token 1964 is 1.0.
             2023: -0.5  #  token 2023 is more unlikely to appear in the completion since its logit bias is negative.
         user: "cena"  # the user of the completion request
+    edit:
+        model: "text-davinci-edit-001"    # the model used for the task
+        temperature: 1  # 0~2 decimal. degree of randomness in the output. more randomness with bigger value
+        topP: 1 # another parameter controlling the randomness. OpenAi suggests not setting both temperature and topP simultaneously
+        n: 1    # Number of candidate editss generated for a request
     moderation:
         model: "text-moderation-latest" # the model used for the moderation
     imageGeneration:
         n: 1    # number of candidate images generated for a request
         size: "1024x1024"  # the size of the image.
         response_format: "url"  # the format of the image in the response.
+        user: "cena"  # the user of the completion request
+    imageEdit:
+        n: 1    # number of candidate images generated for a request
+        size: "1024x1024"  # the size of the image.
+        response_format: "url"  # the format of the image in the response.
+        user: "cena"  # the user of the completion request
+    imageVariation:
+        n: 1    # number of candidate images generated for a request
+        size: "1024x1024"  # the size of the image.
+        response_format: "url"  # the format of the image in the response.
+        user: "cena"  # the user of the completion request
+    Embedding:
+        model: "text-embedding-ada-002" # the model for the task
         user: "cena"  # the user of the completion request
