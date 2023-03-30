@@ -6,7 +6,7 @@ import java.util.Map;
 
 import cool.cena.openai.OpenAiApiAccessor;
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiChatCompletionProperties;
-import cool.cena.openai.exception.OpenAiChatCompletionOutDatedException;
+import cool.cena.openai.exception.chatcompletion.ChatCompletionOutDatedException;
 import cool.cena.openai.pojo.chatcompletion.ChatCompletionMessage;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody;
@@ -176,7 +176,7 @@ public class OpenAiChatCompletionContext {
         }
 
         // context has been updated during the request
-        throw new OpenAiChatCompletionOutDatedException();
+        throw new ChatCompletionOutDatedException();
         
     }
 

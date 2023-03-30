@@ -4,20 +4,33 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import cool.cena.openai.exception.OpenAiChatCompletionBadRequestException;
-import cool.cena.openai.exception.OpenAiChatCompletionStatusCodeException;
-import cool.cena.openai.exception.OpenAiChatCompletionUnauthorizedException;
-import cool.cena.openai.exception.OpenAiChatCompletionUnknownException;
+import cool.cena.openai.exception.OpenAiUnknownException;
+import cool.cena.openai.exception.OpenAiUnauthorizedException;
+import cool.cena.openai.exception.chatcompletion.ChatCompletionBadRequestException;
+import cool.cena.openai.exception.chatcompletion.ChatCompletionResourceAccessException;
+import cool.cena.openai.exception.chatcompletion.ChatCompletionStatusCodeException;
+import cool.cena.openai.exception.image.ImageBadRequestException;
+import cool.cena.openai.exception.image.ImageResourceAccessException;
+import cool.cena.openai.exception.image.ImageStatusCodeException;
+import cool.cena.openai.exception.moderation.ModerationResourceAccessException;
+import cool.cena.openai.exception.moderation.ModerationStatusCodeException;
+import cool.cena.openai.exception.textcompletion.TextCompletionResourceAccessException;
+import cool.cena.openai.exception.textcompletion.TextCompletionStatusCodeException;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody;
 import cool.cena.openai.pojo.image.OpenAiImageEditRequestBody;
 import cool.cena.openai.pojo.image.OpenAiImageEditResponseBody;
 import cool.cena.openai.pojo.image.OpenAiImageGenerationRequestBody;
 import cool.cena.openai.pojo.image.OpenAiImageGenerationResponseBody;
+import cool.cena.openai.pojo.image.OpenAiImageVariationRequestBody;
+import cool.cena.openai.pojo.image.OpenAiImageVariationResponseBody;
 import cool.cena.openai.pojo.moderation.OpenAiModerationRequestBody;
 import cool.cena.openai.pojo.moderation.OpenAiModerationResponseBody;
 import cool.cena.openai.pojo.textcompletion.OpenAiTextCompletionRequestBody;
@@ -30,20 +43,30 @@ public class OpenAiApiAccessor {
     private final String MODERATION_URL = "https://api.openai.com/v1/moderations";
     private final String IMAGE_GENERATION_URL = "https://api.openai.com/v1/images/generations";
     private final String IMAGE_EDIT_URL = "https://api.openai.com/v1/images/edits";
+    private final String IMAGE_VARIATION_URL = "https://api.openai.com/v1/images/variations";
 
 
     private RestTemplate restTemplate;
-    private HttpHeaders httpHeaders;
+    private HttpHeaders httpJsonHeaders, httpFileHeaders;
 
     public OpenAiApiAccessor(HttpHeaders httpHeaders){
+        HttpHeaders httpJsonHeaders = new HttpHeaders();
+        httpJsonHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpJsonHeaders.addAll(httpHeaders);
+        this.httpJsonHeaders = httpJsonHeaders;
+        
+        HttpHeaders httpFileHeaders = new HttpHeaders();
+        httpFileHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+        httpFileHeaders.addAll(httpHeaders);
+        this.httpFileHeaders = httpFileHeaders;
+
         this.restTemplate = new RestTemplate();
-        this.httpHeaders = httpHeaders;
     }
     
     // text completion request
     public OpenAiTextCompletionResponseBody sendRequest(OpenAiTextCompletionRequestBody requestBody){
 
-        HttpEntity<OpenAiTextCompletionRequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+        HttpEntity<OpenAiTextCompletionRequestBody> requestEntity = new HttpEntity<>(requestBody, httpJsonHeaders);
         
         try{
 
@@ -53,25 +76,24 @@ public class OpenAiApiAccessor {
         }catch(HttpStatusCodeException e){
 
             HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
 
-            if(httpStatusCode == HttpStatus.BAD_REQUEST){
-                System.out.println(e.getMessage());
-
-                throw new OpenAiChatCompletionBadRequestException();
-
-            }else if(httpStatusCode == HttpStatus.UNAUTHORIZED){
-
-                throw new OpenAiChatCompletionUnauthorizedException();
+                throw new OpenAiUnauthorizedException(e.getMessage());
 
             }else{
 
-                throw new OpenAiChatCompletionStatusCodeException(httpStatusCode, e.getMessage());
+                throw new TextCompletionStatusCodeException(httpStatusCode, e.getMessage());
 
             }
 
+        }catch(ResourceAccessException e){
+
+            throw new TextCompletionResourceAccessException(e.getMessage());
+
         }catch(RestClientException e){
 
-            throw new OpenAiChatCompletionUnknownException(e.getMessage());
+            throw new OpenAiUnknownException(e.getMessage());
 
         }
     }
@@ -79,7 +101,7 @@ public class OpenAiApiAccessor {
     // chat completion request
     public OpenAiChatCompletionResponseBody sendRequest(OpenAiChatCompletionRequestBody requestBody){
 
-        HttpEntity<OpenAiChatCompletionRequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+        HttpEntity<OpenAiChatCompletionRequestBody> requestEntity = new HttpEntity<>(requestBody, httpJsonHeaders);
         
         try{
 
@@ -92,21 +114,25 @@ public class OpenAiApiAccessor {
 
             if(httpStatusCode == HttpStatus.BAD_REQUEST){
 
-                throw new OpenAiChatCompletionBadRequestException();
+                throw new ChatCompletionBadRequestException(e.getMessage());
 
             }else if(httpStatusCode == HttpStatus.UNAUTHORIZED){
 
-                throw new OpenAiChatCompletionUnauthorizedException();
+                throw new OpenAiUnauthorizedException(e.getMessage());
 
             }else{
 
-                throw new OpenAiChatCompletionStatusCodeException(httpStatusCode, e.getMessage());
+                throw new ChatCompletionStatusCodeException(httpStatusCode, e.getMessage());
 
             }
 
+        }catch(ResourceAccessException e){
+
+            throw new ChatCompletionResourceAccessException(e.getMessage());
+
         }catch(RestClientException e){
 
-            throw new OpenAiChatCompletionUnknownException(e.getMessage());
+            throw new OpenAiUnknownException(e.getMessage());
 
         }
     }
@@ -114,7 +140,7 @@ public class OpenAiApiAccessor {
     // moderation request
     public OpenAiModerationResponseBody sendRequest(OpenAiModerationRequestBody requestBody){
 
-        HttpEntity<OpenAiModerationRequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+        HttpEntity<OpenAiModerationRequestBody> requestEntity = new HttpEntity<>(requestBody, httpJsonHeaders);
         
         try{
 
@@ -124,32 +150,34 @@ public class OpenAiApiAccessor {
         }catch(HttpStatusCodeException e){
 
             HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
 
-            if(httpStatusCode == HttpStatus.BAD_REQUEST){
-
-                throw new OpenAiChatCompletionBadRequestException();
-
-            }else if(httpStatusCode == HttpStatus.UNAUTHORIZED){
-
-                throw new OpenAiChatCompletionUnauthorizedException();
+                throw new OpenAiUnauthorizedException(e.getMessage());
 
             }else{
 
-                throw new OpenAiChatCompletionStatusCodeException(httpStatusCode, e.getMessage());
+                throw new ModerationStatusCodeException(httpStatusCode, e.getMessage());
 
             }
 
+        }catch(ResourceAccessException e){
+
+            throw new ModerationResourceAccessException(e.getMessage());
+
         }catch(RestClientException e){
 
-            throw new OpenAiChatCompletionUnknownException(e.getMessage());
+            throw new OpenAiUnknownException(e.getMessage());
 
         }
     }
 
+
+
     // image generation request
     public OpenAiImageGenerationResponseBody sendRequest(OpenAiImageGenerationRequestBody requestBody){
 
-        HttpEntity<OpenAiImageGenerationRequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+        HttpEntity<OpenAiImageGenerationRequestBody> requestEntity = new HttpEntity<>(requestBody, httpJsonHeaders);
         
         try{
 
@@ -160,36 +188,37 @@ public class OpenAiApiAccessor {
 
             HttpStatusCode httpStatusCode = e.getStatusCode();
 
-            if(httpStatusCode == HttpStatus.BAD_REQUEST){
-                System.out.println(e.getMessage());
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
 
-                throw new OpenAiChatCompletionBadRequestException();
-
-            }else if(httpStatusCode == HttpStatus.UNAUTHORIZED){
-
-                throw new OpenAiChatCompletionUnauthorizedException();
+                throw new OpenAiUnauthorizedException(e.getMessage());
 
             }else{
 
-                throw new OpenAiChatCompletionStatusCodeException(httpStatusCode, e.getMessage());
+                throw new ImageStatusCodeException(httpStatusCode, e.getMessage());
 
             }
 
+        }catch(ResourceAccessException e){
+
+            throw new ImageResourceAccessException(e.getMessage());
+
         }catch(RestClientException e){
 
-            throw new OpenAiChatCompletionUnknownException(e.getMessage());
+            throw new OpenAiUnknownException(e.getMessage());
 
         }
     }
 
-    // image generation request
+
+
+    // image edit request
     public OpenAiImageEditResponseBody sendRequest(OpenAiImageEditRequestBody requestBody){
 
-        HttpEntity<OpenAiImageEditRequestBody> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody.toMultiValueMap(), httpFileHeaders);
         
         try{
 
-            OpenAiImageEditResponseBody responseBody = this.restTemplate.postForObject(this.IMAGE_GENERATION_URL, requestEntity, OpenAiImageEditResponseBody.class);
+            OpenAiImageEditResponseBody responseBody = this.restTemplate.postForObject(this.IMAGE_EDIT_URL, requestEntity, OpenAiImageEditResponseBody.class);
             return responseBody;
         
         }catch(HttpStatusCodeException e){
@@ -197,25 +226,68 @@ public class OpenAiApiAccessor {
             HttpStatusCode httpStatusCode = e.getStatusCode();
 
             if(httpStatusCode == HttpStatus.BAD_REQUEST){
-                System.out.println(e.getMessage());
 
-                throw new OpenAiChatCompletionBadRequestException();
+                throw new ImageBadRequestException(e.getMessage());
 
             }else if(httpStatusCode == HttpStatus.UNAUTHORIZED){
 
-                throw new OpenAiChatCompletionUnauthorizedException();
+                throw new OpenAiUnauthorizedException(e.getMessage());
 
             }else{
 
-                throw new OpenAiChatCompletionStatusCodeException(httpStatusCode, e.getMessage());
+                throw new ImageStatusCodeException(httpStatusCode, e.getMessage());
 
             }
 
+        }catch(ResourceAccessException e){
+
+            throw new ImageResourceAccessException(e.getMessage());
+
         }catch(RestClientException e){
 
-            throw new OpenAiChatCompletionUnknownException(e.getMessage());
+            throw new OpenAiUnknownException(e.getMessage());
 
         }
     }
     
+
+
+    // image variation request
+    public OpenAiImageVariationResponseBody sendRequest(OpenAiImageVariationRequestBody requestBody){
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody.toMultiValueMap(), httpFileHeaders);
+        
+        try{
+
+            OpenAiImageVariationResponseBody responseBody = this.restTemplate.postForObject(this.IMAGE_VARIATION_URL, requestEntity, OpenAiImageVariationResponseBody.class);
+            return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+
+            if(httpStatusCode == HttpStatus.BAD_REQUEST){
+
+                throw new ImageBadRequestException(e.getMessage());
+
+            }else if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new ImageStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new ImageResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
 }

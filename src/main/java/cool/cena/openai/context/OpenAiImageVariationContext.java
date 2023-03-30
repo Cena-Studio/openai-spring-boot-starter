@@ -10,58 +10,47 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 import cool.cena.openai.OpenAiApiAccessor;
-import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiImageEditProperties;
+import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiImageVariationProperties;
 import cool.cena.openai.exception.image.ImageFileInvalidException;
-import cool.cena.openai.pojo.image.OpenAiImageEditRequestBody;
-import cool.cena.openai.pojo.image.OpenAiImageEditResponseBody;
+import cool.cena.openai.pojo.image.OpenAiImageVariationRequestBody;
+import cool.cena.openai.pojo.image.OpenAiImageVariationResponseBody;
 
-public class OpenAiImageEditContext {
+public class OpenAiImageVariationContext {
 
     private OpenAiApiAccessor apiAccessor;
-    private OpenAiImageEditRequestBody requestBody;
+    private OpenAiImageVariationRequestBody requestBody;
 
     // constructor
-    public OpenAiImageEditContext(OpenAiApiAccessor apiAccessor, OpenAiImageEditProperties openAiImageEditProperties) {
+    public OpenAiImageVariationContext(OpenAiApiAccessor apiAccessor, OpenAiImageVariationProperties openAiImageVariationProperties) {
         this.apiAccessor = apiAccessor;
-        this.requestBody = new OpenAiImageEditRequestBody(openAiImageEditProperties);
+        this.requestBody = new OpenAiImageVariationRequestBody(openAiImageVariationProperties);
 
     }
 
     // set request parameters
-    public OpenAiImageEditContext setN(Integer n) {
+    public OpenAiImageVariationContext setN(Integer n) {
         this.requestBody.setN(n);
         return this;
     }
-    public OpenAiImageEditContext setSize(String size) {
+    public OpenAiImageVariationContext setSize(String size) {
         this.requestBody.setSize(size);
         return this;
     }
-    public OpenAiImageEditContext setResponseFormat(String responseFormat) {
+    public OpenAiImageVariationContext setResponseFormat(String responseFormat) {
         this.requestBody.setResponseFormat(responseFormat);
         return this;
     }
-    public OpenAiImageEditContext setUser(String user) {
+    public OpenAiImageVariationContext setUser(String user) {
         this.requestBody.setUser(user);
         return this;
     }
     
 
     // make a request
-    public OpenAiImageEditResponseBody create(Object image, String prompt){
+    public OpenAiImageVariationResponseBody create(Object image){
 
         Resource imageResource = this.resourcify(image);
         this.requestBody.setImage(imageResource);
-        this.requestBody.setPrompt(prompt);
-        return apiAccessor.sendRequest(requestBody);
-    }
-
-    public OpenAiImageEditResponseBody create(Object image, Object mask, String prompt){
-
-        Resource imageResource = this.resourcify(image);
-        Resource maskResource = this.resourcify(mask);
-        this.requestBody.setImage(imageResource);
-        this.requestBody.setMask(maskResource);
-        this.requestBody.setPrompt(prompt);
         return apiAccessor.sendRequest(requestBody);
     }
 
@@ -120,8 +109,7 @@ public class OpenAiImageEditContext {
 
         }
         
-        // the type of the input image object parameter is invalid
         throw new ImageFileInvalidException();
-    }
+    };
 
 }
