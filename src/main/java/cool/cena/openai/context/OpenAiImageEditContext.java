@@ -102,6 +102,10 @@ public class OpenAiImageEditContext {
 
             }
 
+        }else if(imageObject instanceof byte[]){
+
+            return new ByteArrayResource((byte[]) imageObject);
+
         }else if(imageObject instanceof File){
 
             return new FileSystemResource((File) imageObject);

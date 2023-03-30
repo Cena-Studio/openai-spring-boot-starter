@@ -8,7 +8,7 @@ This project is currently established on Spring Boot 3.0.4. Broader version supp
 ![roadmap](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/roadmap.png)
 
 # Quick Start
-## 1 Basic Preparation
+## 1 Fundamental Steps
 ### 1.1 Import Package
 For Maven project, please add the following dependency into your pom.xml:
 ```XML
@@ -40,7 +40,7 @@ public class MyService{
 }
 ```
 ## 2 Text Completion
-Text completion is the a basic form of completion. A response will be generated to answer a prompt.
+Text completion is a basic form of completion. A response will be generated to answer a prompt.
 ### 2.1 Usage
 The following are the basic statements to request for a text completion in a service class:
 ```java
@@ -380,7 +380,7 @@ Double sexual = response.getScoreResults("sexual");
 boolean violence = response.getBooleanResults("violence");
 ```
 ## 5 Image Generation
-This API can synthesize pictures based on your a given prompt.
+This API can synthesize pictures based on a given prompt.
 ### 5.1 Usage
 To use this API with this starter:
 ```java
@@ -459,3 +459,98 @@ public class MyService{
     }
 
 }
+## 6 Image Edit
+This API can edit an existing image based on a given prompt and a mask image.
+### 6.1 Usage
+This API requires image files as request parameters. This starter aim to support different type of input parameters to represent the image file. Currently, it support `String` in base64 format, `String` of the local file path, `String` of the url of a remote image, `File`, `byte[]`, `SystemFileResource`, and `ByteArrayResource`. When an valid `String` argument is passed into the `create()` method, it will be automatically recognized and processed by this starter for making the request. Please see the example below:
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+
+    public void MyMethod(){
+        
+        // create a context for image generation
+        OpenAiImageEditContext imageEdit = openAiSource.createImageEditContext();
+
+        // a remote image resouce
+        String imagePath = "https://www.***.com/sky.png";
+        // make a request with a sky image and the prompt "add a bird"
+        OpenAiImageEditResponseBody response = imageEdit.create(imagePath, "add a bird");
+
+        // a local mask image
+        String maskPath = "src/main/resources/static/mask.png";
+        // make the request with the original image, the prompt, and the mask image
+        OpenAiImageEditResponseBody responseWithMask = imageEdit.create(imagePath, "add a bird"， maskPath);
+
+    }
+
+}
+```
+The response body of the image edit API has the same structure as the image generation. An shortcut to retrieve the image is also provided:
+```java
+// get the base64 string of the image
+response.getData().get(0).get("b64_json");
+
+// get the image with shortcut no matter the format
+response.getImage();
+
+// get the second image if multiple images are generated
+response.getImage(1);
+```
+**ATTENTION** Due to limitations of the OpenAI API, the original image used for a request must be a png file with a square size, i.e. height = width. Besides, it must be in one of RGBA (rgb with alpha channel), LA (grayscale with alpha channel), L (grayscale) formats. This starter aims to provide a broader support in a future update.
+### 6.2 Request Parameters
+The available configuration parameters for the image edit context is the almost same as the image generation context in Section 5.2. The only difference is the `imageEdit` is written to specify the configurations inside belongs to the image edit context.
+```yaml
+openai:
+    key: xx-xxxxxxxx
+    imageEdit:
+        ... # parameters
+```
+## 7 Image Variation
+This API can create different variations of an existing image.
+### 7.1 Usage
+This API has a very similar request body as image edit. The difference is that there is no prompt and mask parameters. The implementation could be down as shown below: 
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+
+    public void MyMethod(){
+        
+        // create a context for image generation
+        OpenAiImageVariationContext imageVariation = openAiSource.createImageVariationContext();
+
+        // a remote image resouce
+        String imagePath = "https://www.***.com/sky.png";
+        // make a request with a sky image
+        OpenAiImageVariationResponseBody response = imageVariation.create(imagePath);
+
+    }
+
+}
+```
+The response body of the image edit API has the same structure as the image generation. An shortcut to retrieve the image is also provided:
+```java
+// get the base64 string of the image
+response.getData().get(0).get("b64_json");
+
+// get the image with shortcut no matter the format
+response.getImage();
+
+// get the second image if multiple images are generated
+response.getImage(1);
+```
+
+### 7.2 Request Parameters
+The available configuration parameters for the image edit context is the almost same as the image generation context in Section 5.2. The only difference is the `imageVariation` is written to specify the configurations inside belongs to the image edit context.
+```yaml
+openai:
+    key: xx-xxxxxxxx
+    imageVariation:
+        ... # parameters
+```
