@@ -814,3 +814,57 @@ openai:
         responseFormat: "json"  # the format of the generated transcription text.
         temperature: 0 # 0~1 decimal. degree of randomness in the output. more randomness with bigger value.
 ```
+## 11 File
+Files API is a set of APIs used to transfer files, which majorly used for fine-tuning, between client and OpenAi server.
+
+Like other file related APIs, this starter supports several types of the argument represengting the file, including `String` in base64 format, `String` of the local file path, `String` of the url of a remote image, `File`, `byte[]`, `SystemFileResource`, and `ByteArrayResource`. When using an valid `String` as the argument, the type will be automatically recognized and processed.
+
+Unlike every API we've discussed so far has its own context. The file related APIs share one context since there is no configuration options for those APIs.
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+
+    public void MyMethod(){
+        
+        // create a context for file related requests
+        OpenAiFileContext openAiFile = openAiSource.createFileContext();
+
+        // use the context to make requests, see the following subsections
+    }
+
+}
+```
+### 11.1 Upload File
+To upload files to OpenAi's server:
+```java
+// upload the file with the purpose "fine-tune"
+OpenAiFileResponseBody response = openAiFile.createFile("src/main/resources/static/train.jsonl", "fine-tune");
+```
+### 11.2 List Files
+To retrieve the list of uploaded files:
+```java
+OpenAiListFileResponseBody response = openAiFile.listFiles();
+```
+### 11.3 Retrieve File
+To retrieve the information of a single file using the file id:
+```java
+// retrieve the file with the file id
+OpenAiFileResponseBody response = openAiFile.retrieveFile("file-xxxxxxxxxxx");
+```
+### 11.4 Retrieve File Content
+To retrieve the content of a single file using the file id:
+```java
+// retrieve the file content with the file id
+OpenAiDownloadFileResponseBody response = openAiFile.downloadFile("file-xxxxxxxxxxx");
+// retrieve and print the content
+System.out.println(response.getContent());
+```
+### 11.5 Delete File
+To delete files from OpenAi's server:
+```java
+// delete the file through the file id
+OpenAiDeleteFileResponseBody response = openAiFile.deleteFile("file-xxxxxxxxxxx");
+```
