@@ -388,13 +388,13 @@ public class OpenAiApiAccessor {
 
 
     // audio transcription request
-    public OpenAiAudioTranscriptionResponseBody sendRequest(OpenAiAudioTranscriptionRequestBody requestBody){
+    public <T> T sendRequest(OpenAiAudioTranscriptionRequestBody requestBody, Class<T> responseClass){
 
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody.toMultiValueMap(), httpJsonHeaders);
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody.toMultiValueMap(), httpFileHeaders);
         
         try{
 
-            OpenAiAudioTranscriptionResponseBody responseBody = this.restTemplate.postForObject(this.AUDIO_TRANSCRIPTION_URL, requestEntity, OpenAiAudioTranscriptionResponseBody.class);
+            T responseBody = this.restTemplate.postForObject(this.AUDIO_TRANSCRIPTION_URL, requestEntity, responseClass);
             return responseBody;
         
         }catch(HttpStatusCodeException e){
@@ -425,13 +425,13 @@ public class OpenAiApiAccessor {
 
 
     // audio translation request
-    public OpenAiAudioTranslationResponseBody sendRequest(OpenAiAudioTranslationRequestBody requestBody){
+    public <T> T sendRequest(OpenAiAudioTranslationRequestBody requestBody, Class<T> responseClass){
 
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody.toMultiValueMap(), httpJsonHeaders);
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody.toMultiValueMap(), httpFileHeaders);
         
         try{
 
-            OpenAiAudioTranslationResponseBody responseBody = this.restTemplate.postForObject(this.AUDIO_TRANSLATION_URL, requestEntity, OpenAiAudioTranslationResponseBody.class);
+            T responseBody = this.restTemplate.postForObject(this.AUDIO_TRANSLATION_URL, requestEntity, responseClass);
             return responseBody;
         
         }catch(HttpStatusCodeException e){

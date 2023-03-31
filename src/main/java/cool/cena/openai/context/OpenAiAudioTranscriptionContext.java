@@ -46,17 +46,24 @@ public class OpenAiAudioTranscriptionContext {
 
     public OpenAiAudioTranscriptionResponseBody create(Object file){
 
-        return this.create(file, "");
-
-    }
-
-
-    public OpenAiAudioTranscriptionResponseBody create(Object file, String prompt){
-
         Resource fileResource = this.resourcify(file);
         this.requestBody.setFile(fileResource);
+
+        // check response format
+        String responseFormat = this.requestBody.getResponseFormat();
+        if(responseFormat.equals("text") || responseFormat.equals("srt") || responseFormat.equals("vtt")){
+            String responseText = apiAccessor.sendRequest(requestBody, String.class);
+            OpenAiAudioTranscriptionResponseBody responseBody = new OpenAiAudioTranscriptionResponseBody();
+            responseBody.setText(responseText);
+            return responseBody;
+        }
+        return apiAccessor.sendRequest(requestBody, OpenAiAudioTranscriptionResponseBody.class);
+        
+    }
+    
+    public OpenAiAudioTranscriptionResponseBody create(Object file, String prompt){
         this.requestBody.setPrompt(prompt);
-        return apiAccessor.sendRequest(requestBody);
+        return this.create(file);
     }
 
     private Resource resourcify(Object audioObject){

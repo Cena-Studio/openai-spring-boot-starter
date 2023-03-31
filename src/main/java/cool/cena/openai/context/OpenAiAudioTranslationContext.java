@@ -42,16 +42,24 @@ public class OpenAiAudioTranslationContext {
 
     public OpenAiAudioTranslationResponseBody create(Object file){
 
-        return this.create(file, "");
+        Resource fileResource = this.resourcify(file);
+        this.requestBody.setFile(fileResource);
+
+        // check response format
+        String responseFormat = this.requestBody.getResponseFormat();
+        if(responseFormat.equals("text") || responseFormat.equals("srt") || responseFormat.equals("vtt")){
+            String responseText = apiAccessor.sendRequest(requestBody, String.class);
+            OpenAiAudioTranslationResponseBody responseBody = new OpenAiAudioTranslationResponseBody();
+            responseBody.setText(responseText);
+            return responseBody;
+        }
+        return apiAccessor.sendRequest(requestBody, OpenAiAudioTranslationResponseBody.class);
         
     }
     
     public OpenAiAudioTranslationResponseBody create(Object file, String prompt){
-
-        Resource fileResource = this.resourcify(file);
-        this.requestBody.setFile(fileResource);
         this.requestBody.setPrompt(prompt);
-        return apiAccessor.sendRequest(requestBody);
+        return this.create(file);
     }
 
     private Resource resourcify(Object audioObject){
