@@ -56,7 +56,7 @@ openai:
         size: "1024x1024"  # the size of the image.
         response_format: "url"  # the format of the image in the response.
         user: "cena"  # the user of the completion request
-    Embedding:
+    embedding:
         model: "text-embedding-ada-002" # the model for the task
         user: "cena"  # the user of the completion request
     audioTranscription:

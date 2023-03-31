@@ -55,8 +55,6 @@ public class OpenAiEmbeddingResponseBody {
         private List<Double> embedding;
         private int index;
 
-        
-
         public String getObject() {
             return object;
         }

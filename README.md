@@ -229,6 +229,7 @@ public class MyService{
 
     public void MyMethod(){
         
+        // create two independent chat completion contexts
         OpenAiChatCompletionContext chatCompletionOne = openAiSource.createChatCompletionContext();
         OpenAiChatCompletionContext chatCompletionTwo = openAiSource.createChatCompletionContext();
 
@@ -338,6 +339,63 @@ chatCompletionOne.switchVersion(latestVersion);
 ```
 **ATTENTION** When rolling back to an early version, the child branches will be discarded to keep the context safe. Developers should be careful when switch to a version that is not the latest version of a branch.
 ## 4 Edit
+This API will respond to you with your input text modified or corrected.
+### 4.1 Usage
+To create an edit request:
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+
+    public void MyMethod(){
+        
+        // create a context for edit
+        OpenAiEditContext edit = openAiSource.createEditContext();
+
+        // make a request with the oritginal text "What day of the wek is today?" and request for spelling mistake fixes.
+        OpenAiEditResponseBody response = edit.create("What day of the wek is today?", "fix the spelling mistakes");
+
+        // get the fixed text and print it "What day of the week is today?"
+        System.out.println(response.getChoices().get(0).getText());
+
+    }
+
+}
+```
+There is also a shortcut for retrieving the text from the response:
+```java
+// get the edited text with a shortcut
+response.getText();
+
+// pass the index in case of multiple choices to get the specific edited text with a shortcut
+response.getText(1);
+```
+### 4.2 Request Parameters
+A general configuration for image generation context could be written in the configuration file before the application launched:
+```yaml
+openai:
+    key: xx-xxxxxxxx
+    edit:
+        model: "text-davinci-edit-001"    # the model used for the task
+        temperature: 1  # 0~2 decimal. degree of randomness in the output. more randomness with bigger value
+        topP: 1 # another parameter controlling the randomness. OpenAi suggests not setting both temperature and topP simultaneously
+        n: 1    # Number of candidate editss generated for a request
+```
+The configuration of each single context instance can be dynamically changed. An example is given below:
+```java
+// create two independent edit contexts
+OpenAiEditContext editOne = openAiSource.createEditContext();
+OpenAiEditContext editTwo = openAiSource.createEditContext();
+
+// editOne and ...Two have same configurations when making requests
+
+editOne.setN("2").setModel("text-davinci-edit-001");
+editTwo.setTopP(0.8);
+
+// now editOne and ...Two have different configurations
+```
 ## 5 Moderation
 Moderation might be an important API to classify if the input texts are violative.
 
@@ -557,3 +615,190 @@ openai:
         ... # parameters
 ```
 ## 9 Embedding
+This API can transfer the input text to a vector representation.
+### 9.1 Usage
+To create an embedding request:
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+
+    public void MyMethod(){
+        
+        // create a context for embedding
+        OpenAiEmbeddingContext embedding = openAiSource.createEmbeddingContext();
+
+        // make a request
+        OpenAiEmbeddingResponseBody response = embedding.create("Create embedding for this input");
+
+        // get the needed information from the response
+        List<Double> embeddingData =  response.getData().get(0).getEmbedding();
+
+    }
+
+}
+```
+As shown above, the processed text will be responded as a group of decimals. There is also a shortcut for easier retrieving that decimal list from the response:
+```java
+// get the embedding list with a shortcut
+response.getEmbedding();
+```
+In the original response body of this API, although the value of `data` parameter is an array, there is actually no multiple choices for this API since there is always only one element inside which contains the vector list.
+### 9.2 Request Parameters
+A general configuration for image generation context could be written in the configuration file before the application launched:
+```yaml
+openai:
+    key: xx-xxxxxxxx
+    embedding:
+        model: "text-embedding-ada-002" # the model for the task
+        user: "cena"  # the user of the completion request
+```
+The configuration of each single context instance can be dynamically changed. An example is given below:
+```java
+// create two independent embedding contexts
+OpenAiEmbeddingContext embeddingOne = openAiSource.createEmbeddingContext();
+OpenAiEmbeddingContext embeddingTwo = openAiSource.createEmbeddingContext();
+
+// embeddingOne and ...Two have same configurations when making requests
+
+embeddingOne.setN("2").setModel("text-davinci-embedding-001");
+embeddingTwo.setTopP(0.8);
+
+// now embeddingOne and ...Two have different configurations
+```
+## 10 Audio Transcription
+By giving a valid audio file, this API can generate a corresponding transcription.
+### 10.1 Usage
+The file support is same as in Section 7.1, which including `String` in base64 format, `String` of the local file path, `String` of the url of a remote image, `File`, `byte[]`, `SystemFileResource`, and `ByteArrayResource`. When using an valid `String` as the argument, the type will be automatically recognized and processed.
+
+The following is an example for making an audio transcription request:
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+
+    public void MyMethod(){
+        
+        // create a context for audio transcription
+        OpenAiAudioTranscriptionContext audioTranscription = openAiSource.createAudioTranscriptionContext();
+
+        // make a request with a local file path
+        OpenAiAudioTranscriptionResponseBody response = audioTranscription.create("src/main/resources/static/audio.mp3");
+
+        // get the transcription text and print it
+        System.out.println(response.getText());
+
+    }
+
+}
+```
+For this api, it is concise enough to get the transcription text without any shortcuts.
+
+In addition to only pass in the file, OpenAI also recommends to give it a prompt to describe the audio for more accurate transcription:
+```java
+// add a prompt for the request
+OpenAiAudioTranscriptionResponseBody response = audioTranscription.create("src/main/resources/static/audio.mp3", "it is a speech text about GPT.");
+```
+Besides the above basic usage, OpenAi also provided different response text format based on the context configuration (the details of the context configuration will soon be discussed in Section 10.2). Currently this starter will not write the valid format of response text, such as srt format, into a file, so that you may do it manually after retrieving them as a String.
+
+For another special response format, which is verbose_json that contains more metadata, it is completely supported by this starter. The following is the response body structure of this format:
+```json
+{
+    task: String,
+    language: String,
+    duration: Double,
+    segments: [
+        {
+            id: Integer,
+            seek: Integer,
+            start: Double,
+            end: Double,
+            text: String,
+            tokens: List<Integer>,
+            tremperature: Double,
+            avgLogProb: Double,
+            compressionRatio: Double,
+            noSpeechProb: Double,
+            trans: Boolean
+        }
+    ],
+    text: String,
+}
+```
+You can use the getters to retrieve the needed data. E.g. get the compression ratio:
+```java
+// get the compression ratio from the verbose_json response
+Double compressionRatio = response.getSegments().get(0).getCompressionRatio();
+```
+### 10.2 Request Parameters
+A general configuration for audio transcription context could be written in the configuration file before the application launched:
+```yaml
+openai:
+    key: xx-xxxxxxxx
+    audioTranscription:
+        model: "whisper-1"  # the model for audio tasks. There is no alternative choices although OpenAi provided this parameter.
+        responseFormat: "json"  # the format of the generated transcription text.
+        language: "en" # language in ISO-639-1 format.
+        temperature: 0 # 0~1 decimal. degree of randomness in the output. more randomness with bigger value.
+```
+Note that "whisper-1" is the only model could be used for this API, OpenAi just opens this parameter though.
+
+The configuration of each single context instance can be dynamically changed. An example is given below:
+```java
+// create two independent audioTranscription contexts
+OpenAiAudioTranscriptionContext audioTranscriptionOne = openAiSource.createAudioTranscriptionContext();
+OpenAiAudioTranscriptionContext audioTranscriptionTwo = openAiSource.createAudioTranscriptionContext();
+
+// audioTranscriptionOne and ...Two have same configurations when making requests
+
+audioTranscriptionOne.setLanguage("zh");
+audioTranscriptionTwo.setResponseFormat("vtt");
+
+// now audioTranscriptionOne and ...Two have different configurations
+```
+## 11 Audio Translation
+This API is simillar to audio transcription but translate the input audio into english transcription.
+### 11.1 Usage
+The following is an example for making an audio translation request:
+```java
+@Service
+public class MyService{
+
+    @Autowired
+    OpenAiSource openAiSource;
+
+    public void MyMethod(){
+        
+        // create a context for audio transcription
+        OpenAiAudioTranslationContext audioTranslation = openAiSource.createAudioTranslationContext();
+
+        // make a request with a local file path
+        OpenAiAudioTranslationResponseBody response = audioTranslation.create("src/main/resources/static/audio.mp3");
+
+        // get and print the translated text
+        System.out.println(response.getText());
+
+    }
+
+}
+```
+Like audio transcription, you can also give prompt for translation.
+```java
+// add a prompt for the request
+OpenAiAudioTranslationResponseBody response = audioTranslation.create("src/main/resources/static/audio.mp3", "it is a speech text about GPT.");
+```
+This API also supports the same response format as audio transcription with the same response body structrue.
+### 11.2 Request Parameters
+The configuration support for audio translation is also quite simillar to audio transcription but there is no `language` parameter.
+```yaml
+openai:
+    key: xx-xxxxxxxx
+    audioTranslation:
+        model: "whisper-1"  # the model for audio tasks. There is no alternative choices although OpenAi provided this parameter.
+        responseFormat: "json"  # the format of the generated transcription text.
+        temperature: 0 # 0~1 decimal. degree of randomness in the output. more randomness with bigger value.
+```
