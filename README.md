@@ -7,6 +7,18 @@ This project is currently established on Spring Boot 3.0.4. Broader version supp
 ## 2 Development Roadmap
 ![roadmap](https://github.com/Cena-Studio/openai-spring-boot-starter/blob/main/assets/roadmap.png)
 
+## 3 Supported API
+- Text Completion (no stream)
+- Chat Completion (no stream)
+- Edit
+- Moderation
+- Image Generation
+- Image Edit
+- Image Variation
+- Embedding
+- Audio Transcription
+- Audio Translation
+
 # Quick Start
 ## 1 Fundamental Steps
 ### 1.1 Import Package
@@ -706,7 +718,7 @@ OpenAiAudioTranscriptionResponseBody response = audioTranscription.create("src/m
 Besides the above basic usage, OpenAi also provided different response text format based on the context configuration (the details of the context configuration will soon be discussed in Section 10.2). Currently this starter will not write the valid format of response text, such as srt format, into a file, so that you may do it manually after retrieving them as a String.
 
 For another special response format, which is verbose_json that contains more metadata, it is completely supported by this starter. The following is the response body structure of this format:
-```json
+```
 {
     task: String,
     language: String,

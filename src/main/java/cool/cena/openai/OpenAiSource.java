@@ -8,6 +8,7 @@ import cool.cena.openai.context.OpenAiAudioTranslationContext;
 import cool.cena.openai.context.OpenAiChatCompletionContext;
 import cool.cena.openai.context.OpenAiEditContext;
 import cool.cena.openai.context.OpenAiEmbeddingContext;
+import cool.cena.openai.context.OpenAiFileContext;
 import cool.cena.openai.context.OpenAiImageEditContext;
 import cool.cena.openai.context.OpenAiImageGenerationContext;
 import cool.cena.openai.context.OpenAiImageVariationContext;
@@ -77,5 +78,9 @@ public class OpenAiSource {
     }
     public OpenAiAudioTranslationContext createAudioTranslationContext(){
         return new OpenAiAudioTranslationContext(this.openAiApiAccessor, openAiProperties.getAudioTranslation());
+    }
+
+    public OpenAiFileContext createFileContext(){
+        return new OpenAiFileContext(this.openAiApiAccessor);
     }
 }

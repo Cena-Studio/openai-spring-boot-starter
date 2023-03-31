@@ -2,9 +2,11 @@ package cool.cena.openai;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
@@ -30,15 +32,18 @@ import cool.cena.openai.exception.moderation.ModerationStatusCodeException;
 import cool.cena.openai.exception.textcompletion.TextCompletionResourceAccessException;
 import cool.cena.openai.exception.textcompletion.TextCompletionStatusCodeException;
 import cool.cena.openai.pojo.audio.OpenAiAudioTranscriptionRequestBody;
-import cool.cena.openai.pojo.audio.OpenAiAudioTranscriptionResponseBody;
 import cool.cena.openai.pojo.audio.OpenAiAudioTranslationRequestBody;
-import cool.cena.openai.pojo.audio.OpenAiAudioTranslationResponseBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionResponseBody;
 import cool.cena.openai.pojo.edit.OpenAiEditRequestBody;
 import cool.cena.openai.pojo.edit.OpenAiEditResponseBody;
 import cool.cena.openai.pojo.embedding.OpenAiEmbeddingRequestBody;
 import cool.cena.openai.pojo.embedding.OpenAiEmbeddingResponseBody;
+import cool.cena.openai.pojo.file.OpenAiListFileResponseBody;
+import cool.cena.openai.pojo.file.OpenAiDeleteFileResponseBody;
+import cool.cena.openai.pojo.file.OpenAiDownloadFileResponseBody;
+import cool.cena.openai.pojo.file.OpenAiFileRequestBody;
+import cool.cena.openai.pojo.file.OpenAiFileResponseBody;
 import cool.cena.openai.pojo.image.OpenAiImageEditRequestBody;
 import cool.cena.openai.pojo.image.OpenAiImageEditResponseBody;
 import cool.cena.openai.pojo.image.OpenAiImageGenerationRequestBody;
@@ -62,6 +67,7 @@ public class OpenAiApiAccessor {
     private final String EMBEDDING_URL = "https://api.openai.com/v1/embeddings";
     private final String AUDIO_TRANSCRIPTION_URL = "https://api.openai.com/v1/audio/transcriptions";
     private final String AUDIO_TRANSLATION_URL = "https://api.openai.com/v1/audio/translations";
+    private final String FILE_URL = "https://api.openai.com/v1/files";
 
 
     private RestTemplate restTemplate;
@@ -433,6 +439,187 @@ public class OpenAiApiAccessor {
 
             T responseBody = this.restTemplate.postForObject(this.AUDIO_TRANSLATION_URL, requestEntity, responseClass);
             return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new AudioResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+
+    // file requests
+    // list file request
+    public OpenAiListFileResponseBody listFiles(){
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
+
+        try{
+
+            ResponseEntity<OpenAiListFileResponseBody> responseEntity = this.restTemplate.exchange(this.FILE_URL, HttpMethod.GET, requestEntity, OpenAiListFileResponseBody.class);
+            return responseEntity.getBody();
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new AudioResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+    
+    // upload file request
+    public OpenAiFileResponseBody createFile(OpenAiFileRequestBody requestBody){
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody.toMultiValueMap(), httpFileHeaders);
+
+        try{
+
+            OpenAiFileResponseBody responseBody = this.restTemplate.postForObject(FILE_URL, requestEntity, OpenAiFileResponseBody.class);
+            return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new AudioResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+    // delete file request
+    public OpenAiDeleteFileResponseBody deleteFile(String fileId){
+
+        String deleteFileUrl = this.FILE_URL + "/" + fileId;
+        HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
+
+        try{
+
+            ResponseEntity<OpenAiDeleteFileResponseBody> responseBody = this.restTemplate.exchange(deleteFileUrl, HttpMethod.DELETE, requestEntity, OpenAiDeleteFileResponseBody.class);
+            return responseBody.getBody();
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new AudioResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+    // retrieve file request
+    public OpenAiFileResponseBody retrieveFile(String fileId){
+
+        String retrieveFileUrl = this.FILE_URL + "/" + fileId;
+        HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
+
+        try{
+
+            ResponseEntity<OpenAiFileResponseBody> responseEntity = this.restTemplate.exchange(retrieveFileUrl, HttpMethod.GET, requestEntity, OpenAiFileResponseBody.class);
+            return responseEntity.getBody();
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new AudioResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+    // download file request
+    public OpenAiDownloadFileResponseBody downloadFile(String fileId){
+
+        String retrieveFileContentUrl = this.FILE_URL + "/" + fileId + "/content";
+        HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
+
+        try{
+
+            ResponseEntity<String> responseEntity = this.restTemplate.exchange(retrieveFileContentUrl, HttpMethod.GET, requestEntity, String.class);
+            return new OpenAiDownloadFileResponseBody(responseEntity.getBody());
         
         }catch(HttpStatusCodeException e){
 
