@@ -1,5 +1,7 @@
 package cool.cena.openai.context;
 
+import java.util.List;
+
 import cool.cena.openai.OpenAiApiAccessor;
 import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiEmbeddingProperties;
 import cool.cena.openai.pojo.embedding.OpenAiEmbeddingRequestBody;
@@ -28,6 +30,11 @@ public class OpenAiEmbeddingContext {
     }
 
     public OpenAiEmbeddingResponseBody create(String input){
+        requestBody.setInput(input);
+        return apiAccessor.sendRequest(requestBody);
+    }
+
+    public OpenAiEmbeddingResponseBody create(List<Integer> input){
         requestBody.setInput(input);
         return apiAccessor.sendRequest(requestBody);
     }

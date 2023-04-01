@@ -18,6 +18,7 @@ This project is currently established on Spring Boot 3.0.4. Broader version supp
 - Embedding
 - Audio Transcription
 - Audio Translation
+- File
 
 # Quick Start
 ## 1 Fundamental Steps

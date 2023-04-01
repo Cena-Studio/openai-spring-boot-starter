@@ -6,7 +6,8 @@ import cool.cena.openai.autoconfigure.OpenAiProperties.OpenAiEmbeddingProperties
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OpenAiEmbeddingRequestBody {
-    private String input, model, user;
+    private String model, user;
+    private Object input;
 
     public OpenAiEmbeddingRequestBody(OpenAiEmbeddingProperties embeddingProperties) {
         this.model = embeddingProperties.getModel();
@@ -21,11 +22,11 @@ public class OpenAiEmbeddingRequestBody {
         this.model = model;
     }
 
-    public String getInput() {
+    public Object getInput() {
         return input;
     }
 
-    public void setInput(String input) {
+    public void setInput(Object input) {
         this.input = input;
     }
 
