@@ -10,7 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 
 import cool.cena.openai.OpenAiApiAccessor;
-import cool.cena.openai.exception.image.ImageFileInvalidException;
+import cool.cena.openai.exception.file.FileInvalidException;
 import cool.cena.openai.pojo.file.OpenAiListFileResponseBody;
 import cool.cena.openai.pojo.file.OpenAiDeleteFileResponseBody;
 import cool.cena.openai.pojo.file.OpenAiDownloadFileResponseBody;
@@ -80,7 +80,7 @@ public class OpenAiFileContext {
                     // it is not a valid image string
                     } catch (MalformedURLException f) {
                         
-                        throw new ImageFileInvalidException(f.getMessage());
+                        throw new FileInvalidException(f.getMessage());
                     }
 
                 }
@@ -105,6 +105,6 @@ public class OpenAiFileContext {
 
         }
         
-        throw new ImageFileInvalidException();
+        throw new FileInvalidException();
     };
 }

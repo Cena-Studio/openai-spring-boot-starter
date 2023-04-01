@@ -28,7 +28,7 @@ For Maven project, please add the following dependency into your pom.xml:
 <dependency>
 	<groupId>org.springframework.boot</groupId>
 	<artifactId>spring-boot-starter-web</artifactId>
-	<version>x.x.x</version> <!-- set a specific version number -->
+	<version>0.3.0</version> <!-- set a specific version number -->
 </dependency>
 ```
 ### 1.2 Configuration

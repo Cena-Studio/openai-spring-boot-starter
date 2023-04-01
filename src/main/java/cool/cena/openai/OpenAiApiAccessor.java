@@ -13,24 +13,15 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import cool.cena.openai.exception.OpenAiUnknownException;
-import cool.cena.openai.exception.audio.AudioResourceAccessException;
-import cool.cena.openai.exception.audio.AudioStatusCodeException;
-import cool.cena.openai.exception.OpenAiUnauthorizedException;
-import cool.cena.openai.exception.chatcompletion.ChatCompletionBadRequestException;
-import cool.cena.openai.exception.chatcompletion.ChatCompletionResourceAccessException;
-import cool.cena.openai.exception.chatcompletion.ChatCompletionStatusCodeException;
-import cool.cena.openai.exception.edit.EditResourceAccessException;
-import cool.cena.openai.exception.edit.EditStatusCodeException;
-import cool.cena.openai.exception.embedding.EmbeddingResourceAccessException;
-import cool.cena.openai.exception.embedding.EmbeddingStatusCodeException;
-import cool.cena.openai.exception.image.ImageBadRequestException;
-import cool.cena.openai.exception.image.ImageResourceAccessException;
-import cool.cena.openai.exception.image.ImageStatusCodeException;
-import cool.cena.openai.exception.moderation.ModerationResourceAccessException;
-import cool.cena.openai.exception.moderation.ModerationStatusCodeException;
-import cool.cena.openai.exception.textcompletion.TextCompletionResourceAccessException;
-import cool.cena.openai.exception.textcompletion.TextCompletionStatusCodeException;
+import cool.cena.openai.exception.*;
+import cool.cena.openai.exception.audio.*;
+import cool.cena.openai.exception.chatcompletion.*;
+import cool.cena.openai.exception.edit.*;
+import cool.cena.openai.exception.embedding.*;
+import cool.cena.openai.exception.image.*;
+import cool.cena.openai.exception.moderation.*;
+import cool.cena.openai.exception.textcompletion.*;
+import cool.cena.openai.exception.file.*;
 import cool.cena.openai.pojo.audio.OpenAiAudioTranscriptionRequestBody;
 import cool.cena.openai.pojo.audio.OpenAiAudioTranslationRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
@@ -487,13 +478,13 @@ public class OpenAiApiAccessor {
 
             }else{
 
-                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+                throw new ListFileStatusCodeException(httpStatusCode, e.getMessage());
 
             }
 
         }catch(ResourceAccessException e){
 
-            throw new AudioResourceAccessException(e.getMessage());
+            throw new ListFileResourceAccessException(e.getMessage());
 
         }catch(RestClientException e){
 
@@ -523,13 +514,13 @@ public class OpenAiApiAccessor {
 
             }else{
 
-                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+                throw new CreateFileStatusCodeException(httpStatusCode, e.getMessage());
 
             }
 
         }catch(ResourceAccessException e){
 
-            throw new AudioResourceAccessException(e.getMessage());
+            throw new CreateFileResourceAccessException(e.getMessage());
 
         }catch(RestClientException e){
 
@@ -559,13 +550,13 @@ public class OpenAiApiAccessor {
 
             }else{
 
-                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+                throw new DeleteFileStatusCodeException(httpStatusCode, e.getMessage());
 
             }
 
         }catch(ResourceAccessException e){
 
-            throw new AudioResourceAccessException(e.getMessage());
+            throw new DeleteFileResourceAccessException(e.getMessage());
 
         }catch(RestClientException e){
 
@@ -595,13 +586,13 @@ public class OpenAiApiAccessor {
 
             }else{
 
-                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+                throw new RetrieveFileStatusCodeException(httpStatusCode, e.getMessage());
 
             }
 
         }catch(ResourceAccessException e){
 
-            throw new AudioResourceAccessException(e.getMessage());
+            throw new RetrieveFileResourceAccessException(e.getMessage());
 
         }catch(RestClientException e){
 
@@ -631,13 +622,13 @@ public class OpenAiApiAccessor {
 
             }else{
 
-                throw new AudioStatusCodeException(httpStatusCode, e.getMessage());
+                throw new DownloadFileStatusCodeException(httpStatusCode, e.getMessage());
 
             }
 
         }catch(ResourceAccessException e){
 
-            throw new AudioResourceAccessException(e.getMessage());
+            throw new DownloadFileResourceAccessException(e.getMessage());
 
         }catch(RestClientException e){
 
