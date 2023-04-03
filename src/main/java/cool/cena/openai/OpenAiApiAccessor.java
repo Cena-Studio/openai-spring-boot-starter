@@ -34,7 +34,7 @@ import cool.cena.openai.pojo.file.OpenAiListFileResponseBody;
 import cool.cena.openai.pojo.file.OpenAiDeleteFileResponseBody;
 import cool.cena.openai.pojo.file.OpenAiDownloadFileResponseBody;
 import cool.cena.openai.pojo.file.OpenAiFileRequestBody;
-import cool.cena.openai.pojo.file.OpenAiFileResponseBody;
+import cool.cena.openai.pojo.file.OpenAiFile;
 import cool.cena.openai.pojo.image.OpenAiImageEditRequestBody;
 import cool.cena.openai.pojo.image.OpenAiImageEditResponseBody;
 import cool.cena.openai.pojo.image.OpenAiImageGenerationRequestBody;
@@ -495,13 +495,13 @@ public class OpenAiApiAccessor {
 
     
     // upload file request
-    public OpenAiFileResponseBody createFile(OpenAiFileRequestBody requestBody){
+    public OpenAiFile createFile(OpenAiFileRequestBody requestBody){
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody.toMultiValueMap(), httpFileHeaders);
 
         try{
 
-            OpenAiFileResponseBody responseBody = this.restTemplate.postForObject(FILE_URL, requestEntity, OpenAiFileResponseBody.class);
+            OpenAiFile responseBody = this.restTemplate.postForObject(FILE_URL, requestEntity, OpenAiFile.class);
             return responseBody;
         
         }catch(HttpStatusCodeException e){
@@ -566,14 +566,14 @@ public class OpenAiApiAccessor {
     }
 
     // retrieve file request
-    public OpenAiFileResponseBody retrieveFile(String fileId){
+    public OpenAiFile retrieveFile(String fileId){
 
         String retrieveFileUrl = this.FILE_URL + "/" + fileId;
         HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
 
         try{
 
-            ResponseEntity<OpenAiFileResponseBody> responseEntity = this.restTemplate.exchange(retrieveFileUrl, HttpMethod.GET, requestEntity, OpenAiFileResponseBody.class);
+            ResponseEntity<OpenAiFile> responseEntity = this.restTemplate.exchange(retrieveFileUrl, HttpMethod.GET, requestEntity, OpenAiFile.class);
             return responseEntity.getBody();
         
         }catch(HttpStatusCodeException e){

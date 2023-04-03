@@ -5,7 +5,7 @@ import java.util.List;
 public class OpenAiListFileResponseBody {
 
     private String object;
-    private List<OpenAiFileResponseBody> data;
+    private List<OpenAiFile> data;
 
     public String getObject() {
         return object;
@@ -13,10 +13,10 @@ public class OpenAiListFileResponseBody {
     public void setObject(String object) {
         this.object = object;
     }
-    public List<OpenAiFileResponseBody> getData() {
+    public List<OpenAiFile> getData() {
         return data;
     }
-    public void setData(List<OpenAiFileResponseBody> data) {
+    public void setData(List<OpenAiFile> data) {
         this.data = data;
     }
     

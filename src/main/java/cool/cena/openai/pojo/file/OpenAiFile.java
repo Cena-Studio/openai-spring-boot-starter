@@ -2,7 +2,7 @@ package cool.cena.openai.pojo.file;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class OpenAiFileResponseBody {
+public class OpenAiFile {
     private String id, object, filename, purpose;
     private Integer bytes;
     @JsonProperty("created_at")

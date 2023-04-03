@@ -15,7 +15,7 @@ import cool.cena.openai.pojo.file.OpenAiListFileResponseBody;
 import cool.cena.openai.pojo.file.OpenAiDeleteFileResponseBody;
 import cool.cena.openai.pojo.file.OpenAiDownloadFileResponseBody;
 import cool.cena.openai.pojo.file.OpenAiFileRequestBody;
-import cool.cena.openai.pojo.file.OpenAiFileResponseBody;
+import cool.cena.openai.pojo.file.OpenAiFile;
 
 public class OpenAiFileContext {
 
@@ -30,7 +30,7 @@ public class OpenAiFileContext {
         return apiAccessor.listFiles();
     }
 
-    public OpenAiFileResponseBody createFile(Object file, String purpose){
+    public OpenAiFile createFile(Object file, String purpose){
         Resource fileResource = this.resourcify(file);
         OpenAiFileRequestBody requestBody = new OpenAiFileRequestBody();
         requestBody.setFile(fileResource);
@@ -42,7 +42,7 @@ public class OpenAiFileContext {
         return apiAccessor.deleteFile(fileId);
     }
 
-    public OpenAiFileResponseBody retrieveFile(String fileId){
+    public OpenAiFile retrieveFile(String fileId){
         return apiAccessor.retrieveFile(fileId);
     }
 

@@ -26,6 +26,7 @@ public class OpenAiProperties {
     private OpenAiEmbeddingProperties embedding = new OpenAiEmbeddingProperties();
     private OpenAiAudioTranscriptionProperties audioTranscription = new OpenAiAudioTranscriptionProperties();
     private OpenAiAudioTranslationProperties audioTranslation = new OpenAiAudioTranslationProperties();
+    private OpenAiFineTuneProperties fineTune = new OpenAiFineTuneProperties();
 
     public String getKey() {
         return key;
@@ -123,6 +124,15 @@ public class OpenAiProperties {
 
     public void setAudioTranslation(OpenAiAudioTranslationProperties audioTranslation) {
         this.audioTranslation = audioTranslation;
+    }
+
+
+    public OpenAiFineTuneProperties getFineTune() {
+        return fineTune;
+    }
+
+    public void setFineTune(OpenAiFineTuneProperties fineTune) {
+        this.fineTune = fineTune;
     }
 
 
@@ -528,5 +538,74 @@ public class OpenAiProperties {
 
     public static class OpenAiAudioTranslationProperties extends OpenAiAudioProperties{}
     
-    
+    public static class OpenAiFineTuneProperties{
+
+        private String model, classificationPositiveClass, suffix;
+        private Integer nEpochs, batchSize, classificationNClasses;
+        private Double learningRateMultiplier, promptLossWeight;
+        private Boolean computeClassificationMetrics;
+        private Double[] classificationBetas;
+        public String getModel() {
+            return model;
+        }
+        public void setModel(String model) {
+            this.model = model;
+        }
+        public String getClassificationPositiveClass() {
+            return classificationPositiveClass;
+        }
+        public void setClassificationPositiveClass(String classificationPositiveClass) {
+            this.classificationPositiveClass = classificationPositiveClass;
+        }
+        public String getSuffix() {
+            return suffix;
+        }
+        public void setSuffix(String suffix) {
+            this.suffix = suffix;
+        }
+        public Integer getnEpochs() {
+            return nEpochs;
+        }
+        public void setnEpochs(Integer nEpochs) {
+            this.nEpochs = nEpochs;
+        }
+        public Integer getBatchSize() {
+            return batchSize;
+        }
+        public void setBatchSize(Integer batchSize) {
+            this.batchSize = batchSize;
+        }
+        public Integer getClassificationNClasses() {
+            return classificationNClasses;
+        }
+        public void setClassificationNClasses(Integer classificationNClasses) {
+            this.classificationNClasses = classificationNClasses;
+        }
+        public Double getLearningRateMultiplier() {
+            return learningRateMultiplier;
+        }
+        public void setLearningRateMultiplier(Double learningRateMultiplier) {
+            this.learningRateMultiplier = learningRateMultiplier;
+        }
+        public Double getPromptLossWeight() {
+            return promptLossWeight;
+        }
+        public void setPromptLossWeight(Double promptLossWeight) {
+            this.promptLossWeight = promptLossWeight;
+        }
+        public Boolean getComputeClassificationMetrics() {
+            return computeClassificationMetrics;
+        }
+        public void setComputeClassificationMetrics(Boolean computeClassificationMetrics) {
+            this.computeClassificationMetrics = computeClassificationMetrics;
+        }
+        public Double[] getClassificationBetas() {
+            return classificationBetas;
+        }
+        public void setClassificationBetas(Double[] classificationBetas) {
+            this.classificationBetas = classificationBetas;
+        }
+
+        
+    }
 }
