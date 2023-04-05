@@ -8,10 +8,10 @@ import cool.cena.openai.pojo.file.OpenAiFile;
 
 public class OpenAiFineTuneResponseBody {
     private String id, object, model, status;
-    @JsonProperty("fineTunedModel")
-    private String fine_tuned_model;
-    @JsonProperty("organizationId")
-    private String organization_id;
+    @JsonProperty("fine_tuned_model")
+    private String fineTunedModel;
+    @JsonProperty("organization_id")
+    private String organizationId;
     private OpenAiFineTuneResponseHyperparams hyperparams;
     @JsonProperty("created_at")
     private Long createdAt;
@@ -56,20 +56,22 @@ public class OpenAiFineTuneResponseBody {
         this.status = status;
     }
 
-    public String getFine_tuned_model() {
-        return fine_tuned_model;
+    
+
+    public String getFineTunedModel() {
+        return fineTunedModel;
     }
 
-    public void setFine_tuned_model(String fine_tuned_model) {
-        this.fine_tuned_model = fine_tuned_model;
+    public void setFineTunedModel(String fineTunedModel) {
+        this.fineTunedModel = fineTunedModel;
     }
 
-    public String getOrganization_id() {
-        return organization_id;
+    public String getOrganizationId() {
+        return organizationId;
     }
 
-    public void setOrganization_id(String organization_id) {
-        this.organization_id = organization_id;
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     public OpenAiFineTuneResponseHyperparams getHyperparams() {

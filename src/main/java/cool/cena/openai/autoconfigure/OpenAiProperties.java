@@ -605,7 +605,6 @@ public class OpenAiProperties {
         public void setClassificationBetas(Double[] classificationBetas) {
             this.classificationBetas = classificationBetas;
         }
-
         
     }
 }

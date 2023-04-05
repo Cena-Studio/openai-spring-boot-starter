@@ -9,6 +9,7 @@ import cool.cena.openai.context.OpenAiChatCompletionContext;
 import cool.cena.openai.context.OpenAiEditContext;
 import cool.cena.openai.context.OpenAiEmbeddingContext;
 import cool.cena.openai.context.OpenAiFileContext;
+import cool.cena.openai.context.OpenAiFineTuneContext;
 import cool.cena.openai.context.OpenAiImageEditContext;
 import cool.cena.openai.context.OpenAiImageGenerationContext;
 import cool.cena.openai.context.OpenAiImageVariationContext;
@@ -82,5 +83,9 @@ public class OpenAiSource {
 
     public OpenAiFileContext createFileContext(){
         return new OpenAiFileContext(this.openAiApiAccessor);
+    }
+
+    public OpenAiFineTuneContext createFineTuneContext(){
+        return new OpenAiFineTuneContext(this.openAiApiAccessor, openAiProperties.getFineTune());
     }
 }

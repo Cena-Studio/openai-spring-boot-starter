@@ -1,9 +1,5 @@
 package cool.cena.openai.pojo.finetune;
 
-import org.springframework.core.io.Resource;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
