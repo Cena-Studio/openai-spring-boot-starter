@@ -22,6 +22,18 @@ import cool.cena.openai.exception.image.*;
 import cool.cena.openai.exception.moderation.*;
 import cool.cena.openai.exception.textcompletion.*;
 import cool.cena.openai.exception.file.*;
+import cool.cena.openai.exception.finetune.CancelFineTuneResourceAccessException;
+import cool.cena.openai.exception.finetune.CancelFineTuneStatusCodeException;
+import cool.cena.openai.exception.finetune.CreateFineTuneResourceAccessException;
+import cool.cena.openai.exception.finetune.CreateFineTuneStatusCodeException;
+import cool.cena.openai.exception.finetune.DeleteFineTuneResourceAccessException;
+import cool.cena.openai.exception.finetune.DeleteFineTuneStatusCodeException;
+import cool.cena.openai.exception.finetune.ListFineTuneEventsResourceAccessException;
+import cool.cena.openai.exception.finetune.ListFineTuneEventsStatusCodeException;
+import cool.cena.openai.exception.finetune.ListFineTuneResourceAccessException;
+import cool.cena.openai.exception.finetune.ListFineTuneStatusCodeException;
+import cool.cena.openai.exception.finetune.RetrieveFineTuneResourceAccessException;
+import cool.cena.openai.exception.finetune.RetrieveFineTuneStatusCodeException;
 import cool.cena.openai.pojo.audio.OpenAiAudioTranscriptionRequestBody;
 import cool.cena.openai.pojo.audio.OpenAiAudioTranslationRequestBody;
 import cool.cena.openai.pojo.chatcompletion.OpenAiChatCompletionRequestBody;
@@ -31,6 +43,13 @@ import cool.cena.openai.pojo.edit.OpenAiEditResponseBody;
 import cool.cena.openai.pojo.embedding.OpenAiEmbeddingRequestBody;
 import cool.cena.openai.pojo.embedding.OpenAiEmbeddingResponseBody;
 import cool.cena.openai.pojo.file.OpenAiListFileResponseBody;
+import cool.cena.openai.pojo.finetune.OpenAiCancelFineTuneResponseBody;
+import cool.cena.openai.pojo.finetune.OpenAiCreateFineTuneResponseBody;
+import cool.cena.openai.pojo.finetune.OpenAiDeleteFineTuneResponseBody;
+import cool.cena.openai.pojo.finetune.OpenAiFineTuneRequestBody;
+import cool.cena.openai.pojo.finetune.OpenAiListFineTuneEventsResponseBody;
+import cool.cena.openai.pojo.finetune.OpenAiListFineTuneResponseBody;
+import cool.cena.openai.pojo.finetune.OpenAiRetrieveFineTuneResponseBody;
 import cool.cena.openai.pojo.file.OpenAiDeleteFileResponseBody;
 import cool.cena.openai.pojo.file.OpenAiDownloadFileResponseBody;
 import cool.cena.openai.pojo.file.OpenAiFileRequestBody;
@@ -59,7 +78,7 @@ public class OpenAiApiAccessor {
     private final String AUDIO_TRANSCRIPTION_URL = "https://api.openai.com/v1/audio/transcriptions";
     private final String AUDIO_TRANSLATION_URL = "https://api.openai.com/v1/audio/translations";
     private final String FILE_URL = "https://api.openai.com/v1/files";
-
+    private final String FINE_TUNE_URL = "https://api.openai.com/v1/fine-tunes";
 
     private RestTemplate restTemplate;
     private HttpHeaders httpJsonHeaders, httpFileHeaders;
@@ -629,6 +648,223 @@ public class OpenAiApiAccessor {
         }catch(ResourceAccessException e){
 
             throw new DownloadFileResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+
+
+    // fine tune requests
+    // create fine tune request
+    public OpenAiCreateFineTuneResponseBody sendRequest(OpenAiFineTuneRequestBody requestBody){
+
+        HttpEntity<OpenAiFineTuneRequestBody> requestEntity = new HttpEntity<>(requestBody, httpJsonHeaders);
+        
+        try{
+
+            OpenAiCreateFineTuneResponseBody responseBody = this.restTemplate.postForObject(this.FINE_TUNE_URL, requestEntity, OpenAiCreateFineTuneResponseBody.class);
+            return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new CreateFineTuneStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new CreateFineTuneResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+    // list fine tunes request
+    public OpenAiListFineTuneResponseBody listFineTunes(){
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
+
+        try{
+
+            ResponseEntity<OpenAiListFineTuneResponseBody> responseEntity = this.restTemplate.exchange(this.FILE_URL, HttpMethod.GET, requestEntity, OpenAiListFineTuneResponseBody.class);
+            return responseEntity.getBody();
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new ListFineTuneStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new ListFineTuneResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+    // retrieve fine tune request
+    public OpenAiRetrieveFineTuneResponseBody retrieveFineTune(String fineTuneId){
+
+        String retrieveFineTuneUrl = this.FILE_URL + "/" + fineTuneId;
+        HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
+
+        try{
+
+            ResponseEntity<OpenAiRetrieveFineTuneResponseBody> responseEntity = this.restTemplate.exchange(retrieveFineTuneUrl, HttpMethod.GET, requestEntity, OpenAiRetrieveFineTuneResponseBody.class);
+            return responseEntity.getBody();
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new RetrieveFineTuneStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new RetrieveFineTuneResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+    // cancel fine tune request
+    public OpenAiCancelFineTuneResponseBody cancelFineTune(String fineTuneId){
+
+        String cancelFineTuneUrl = this.FILE_URL + "/" + fineTuneId + "/cancel";
+        HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
+
+        try{
+
+            OpenAiCancelFineTuneResponseBody responseBody = this.restTemplate.postForObject(cancelFineTuneUrl, requestEntity, OpenAiCancelFineTuneResponseBody.class);
+            return responseBody;
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new CancelFineTuneStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new CancelFineTuneResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+    // list fine tune events request
+    public OpenAiListFineTuneEventsResponseBody listFineTuneEvents(String fineTuneId){
+
+        String listFineTuneEventsUrl = this.FILE_URL + "/" + fineTuneId + "/events";
+        HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
+
+        try{
+
+            ResponseEntity<OpenAiListFineTuneEventsResponseBody> responseEntity = this.restTemplate.exchange(listFineTuneEventsUrl, HttpMethod.GET, requestEntity, OpenAiListFineTuneEventsResponseBody.class);
+            return responseEntity.getBody();
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new ListFineTuneEventsStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new ListFineTuneEventsResourceAccessException(e.getMessage());
+
+        }catch(RestClientException e){
+
+            throw new OpenAiUnknownException(e.getMessage());
+
+        }
+    }
+
+    // delete fine tune request
+    public OpenAiDeleteFineTuneResponseBody deleteFineTune(String model){
+
+        String deleteFineTuneUrl = "https://api.openai.com/v1/models/" + model;
+        HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
+
+        try{
+
+            ResponseEntity<OpenAiDeleteFineTuneResponseBody> responseEntity = this.restTemplate.exchange(deleteFineTuneUrl, HttpMethod.DELETE, requestEntity, OpenAiDeleteFineTuneResponseBody.class);
+            return responseEntity.getBody();
+        
+        }catch(HttpStatusCodeException e){
+
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            
+            if(httpStatusCode == HttpStatus.UNAUTHORIZED){
+
+                throw new OpenAiUnauthorizedException(e.getMessage());
+
+            }else{
+
+                throw new DeleteFineTuneStatusCodeException(httpStatusCode, e.getMessage());
+
+            }
+
+        }catch(ResourceAccessException e){
+
+            throw new DeleteFineTuneResourceAccessException(e.getMessage());
 
         }catch(RestClientException e){
 
