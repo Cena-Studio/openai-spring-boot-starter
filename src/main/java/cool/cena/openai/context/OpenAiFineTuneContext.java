@@ -22,6 +22,37 @@ public class OpenAiFineTuneContext {
         this.requestBody = new OpenAiFineTuneRequestBody(properties);
     }
 
+    public void setModel(String model) {
+        this.requestBody.setModel(model);
+    }
+    public void setSuffix(String suffix) {
+        this.requestBody.setSuffix(suffix);
+    }
+    public void setClassificationPositiveClass(String classificationPositiveClass) {
+        this.requestBody.setClassificationPositiveClass(classificationPositiveClass);
+    }
+    public void setnEpochs(Integer nEpochs) {
+        this.requestBody.setnEpochs(nEpochs);
+    }
+    public void setBatchSize(Integer batchSize) {
+        this.requestBody.setBatchSize(batchSize) ;
+    }
+    public void setClassificationNClasses(Integer classificationNClasses) {
+        this.requestBody.setClassificationNClasses(classificationNClasses);
+    }
+    public void setLearningRateMultiplier(Double learningRateMultiplier) {
+        this.requestBody.setLearningRateMultiplier(learningRateMultiplier);
+    }
+    public void setPromptLossWeight(Double promptLossWeight) {
+        this.requestBody.setPromptLossWeight(promptLossWeight);
+    }
+    public void setComputeClassificationMetrics(Boolean computeClassificationMetrics) {
+        this.requestBody.setComputeClassificationMetrics(computeClassificationMetrics);
+    }
+    public void setClassificationBetas(Double[] classificationBetas) {
+        this.requestBody.setClassificationBetas(classificationBetas);
+    }
+
     public OpenAiCreateFineTuneResponseBody createFineTune(String trainingFileId){
         return this.createFineTune(trainingFileId, null);
     }
