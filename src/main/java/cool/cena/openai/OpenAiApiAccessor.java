@@ -732,7 +732,7 @@ public class OpenAiApiAccessor {
     // retrieve fine tune request
     public OpenAiRetrieveFineTuneResponseBody retrieveFineTune(String fineTuneId){
 
-        String retrieveFineTuneUrl = this.FILE_URL + "/" + fineTuneId;
+        String retrieveFineTuneUrl = this.FINE_TUNE_URL + "/" + fineTuneId;
         HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
 
         try{
@@ -768,7 +768,7 @@ public class OpenAiApiAccessor {
     // cancel fine tune request
     public OpenAiCancelFineTuneResponseBody cancelFineTune(String fineTuneId){
 
-        String cancelFineTuneUrl = this.FILE_URL + "/" + fineTuneId + "/cancel";
+        String cancelFineTuneUrl = this.FINE_TUNE_URL + "/" + fineTuneId + "/cancel";
         HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
 
         try{
@@ -804,7 +804,7 @@ public class OpenAiApiAccessor {
     // list fine tune events request
     public OpenAiListFineTuneEventsResponseBody listFineTuneEvents(String fineTuneId){
 
-        String listFineTuneEventsUrl = this.FILE_URL + "/" + fineTuneId + "/events";
+        String listFineTuneEventsUrl = this.FINE_TUNE_URL + "/" + fineTuneId + "/events";
         HttpEntity<String> requestEntity = new HttpEntity<>(httpFileHeaders);
 
         try{
