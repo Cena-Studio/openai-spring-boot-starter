@@ -68,3 +68,14 @@ openai:
         model: "whisper-1"  # the model for audio tasks. There is no alternative choices although OpenAi provided this parameter.
         responseFormat: "json"  # the format of the generated transcription text.
         temperature: 0 # 0~1 decimal. degree of randomness in the output. more randomness with bigger value.
+    fineTune: # the following are the request parameters for the create fine tune API. Considering its professionalism, please visit https://platform.openai.com/docs/api-reference/fine-tunes/create for full explanation.
+        model: "curie"
+        nEpochs: 4
+        batchSize: 10
+        learningRateMultiplier: 0.02
+        promptLossWeight: 0.01
+        computeClassificationMetrics: false
+        classificationNClasses: 3
+        classificationPositiveClass: "positive"
+        classificationBetas: [0.1, 0.1]
+        suffix: "custom-model-name"
